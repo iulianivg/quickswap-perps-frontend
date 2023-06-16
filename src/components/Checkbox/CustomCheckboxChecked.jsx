@@ -4,7 +4,7 @@ function Icon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
       <g id="Group_25583" data-name="Group 25583" transform="translate(-1393 -426)">
-        <g id="Rectangle_22120" data-name="Rectangle 22120" transform="translate(1393 426)" fill="#448aff" stroke="#448aff" stroke-width="2">
+        <g id="Rectangle_22120" data-name="Rectangle 22120" transform="translate(1393 426)" fill="#448aff" stroke="#448aff" strokeWidth="2">
           <rect width="16" height="16" rx="4" stroke="none"/>
           <rect x="1" y="1" width="14" height="14" rx="3" fill="none"/>
         </g>

@@ -571,10 +571,14 @@ export default function QlpSwap(props) {
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner());
     const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemQlpETH" : "unstakeAndRedeemQlp";
+    console.log("🚀 ~ file: QlpSwap.js:574 ~ sellQlp ~ swapTokenAddress:", swapTokenAddress)
+    console.log("🚀 ~ file: QlpSwap.js:574 ~ sellQlp ~ method:", method)
+    
     const params =
-      swapTokenAddress === AddressZero
-        ? [qlpAmount, minOut, account]
-        : [swapTokenAddress, qlpAmount, minOut, account];
+    swapTokenAddress === AddressZero
+    ? [qlpAmount, minOut, account]
+    : [swapTokenAddress, qlpAmount, minOut, account];
+    console.log("🚀 ~ file: QlpSwap.js:578 ~ sellQlp ~ params:", params)
 
     callContract(chainId, contract, method, params, {
       sentMsg: "Sell submitted!",

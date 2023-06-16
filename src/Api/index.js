@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { gql } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useSWR from "swr";
 
 import OrderBook from "../abis/OrderBook.json";
@@ -137,6 +137,58 @@ export function useInfoTokens(library, chainId, active, tokenBalances, fundingRa
       nativeTokenAddress
     ),
   };
+}
+
+//return 30decimal usd price
+export function useQuickUsdPrice() {
+  const defaultPrice = expandDecimals(5, 28);
+  const fetcher = (url) => fetch(url).then((r) => r.json());
+
+  const { data, error } = useSWR("https://api.coingecko.com/api/v3/simple/price?ids=quickswap&vs_currencies=usd", {
+    dedupingInterval: 60000,
+    fetcher: fetcher,
+  });
+  return data ? expandDecimals(Number(data["quickswap"]["usd"]) * 1e6, 24) : defaultPrice;
+}
+
+export function useCoingeckoPrices(symbol) {
+  // token ids https://api.coingecko.com/api/v3/coins
+  const _symbol = {
+    BTC: "bitcoin",
+    ETH: "ethereum",
+    MATIC: "matic-network",
+    WBTC: "wrapped-bitcoin",
+    USDC: "usd-coin",
+    USDT: "tether",
+    DAI: "dai",
+    QUICK: "quickswap",
+  }[symbol];
+
+  const _defaultPrice = {
+    BTC: 27000,
+    ETH: 1800,
+    MATIC: 0.8,
+    WBTC: 27000,
+    USDC: 1,
+    USDT: 1,
+    DAI: 1,
+    QUICK: 0.044,
+  }[symbol];
+
+  const { res, error } = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd`, {
+    dedupingInterval: 60000,
+    fetcher: fetcher,
+  });
+
+  const data = useMemo(() => {
+    if (!res || res[symbol] ||  res[symbol]["usd"] === 0) {
+      return expandDecimals(_defaultPrice * 1e6, 24);
+    }
+
+    return expandDecimals(Number(res[_symbol]["usd"]) * 1e6, 24);
+  }, [res]);
+
+  return data;
 }
 
 export function useUserStat(chainId) {

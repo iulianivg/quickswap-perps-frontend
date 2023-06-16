@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import Modal from "../../components/Modal/Modal";
 import Checkbox from "../../components/Checkbox/Checkbox";
@@ -6,6 +6,7 @@ import Vault from "../../abis/Vault.json";
 import Reader from "../../abis/Reader.json";
 import RewardRouter from "../../abis/RewardRouter.json";
 import RewardReader from "../../abis/RewardReader.json";
+import FeeQlpTracker from "../../abis/FeeQlpTracker.json";
 import QlpManager from "../../abis/QlpManager.json";
 import { ethers } from "ethers";
 import {
@@ -21,15 +22,16 @@ import {
     getDepositBalanceData,
     getStakingData,
     getProcessedData,
+    expandDecimals,
 
 } from "../../Helpers";
-import { callContract } from "../../Api";
+import { callContract, useCoingeckoPrices, useInfoTokens } from "../../Api";
 import { getConstant } from "../../Constants";
 import useSWR from "swr";
 import { getContract } from "../../Addresses";
 import "./Stake.css";
 
-function CompoundModal(props) {
+function NewClaimAllButton(props) {
     const {
         isVisible,
         setIsVisible,
@@ -38,13 +40,11 @@ function CompoundModal(props) {
         chainId,
         setPendingTxns,
         wrappedTokenSymbol,
+        nativeTokenSymbol,
+        isClaim
     } = props;
-    const [isCompounding, setIsCompounding] = useState(false);
+    const [isClaiming, setIsClaiming] = useState(false);
 
-    const [shouldClaimWeth, setShouldClaimWeth] = useLocalStorageSerializeKey(
-        [chainId, "Stake-compound-should-claim-weth"],
-        true
-    );
     const [shouldConvertWeth, setShouldConvertWeth] = useLocalStorageSerializeKey(
         [chainId, "Stake-compound-should-convert-weth"],
         true
@@ -56,36 +56,33 @@ function CompoundModal(props) {
     );
 
     const isPrimaryEnabled = () => {
-        return !isCompounding;
+        return !isClaiming;
     };
 
     const getPrimaryText = () => {
-
-        if (isCompounding) {
-            return "Compounding...";
+        if (isClaiming) {
+            return "Claim All...";
         }
-        return "Compound";
+        return "Claim All";
     };
 
     const onClickPrimary = () => {
 
-        setIsCompounding(true);
+        setIsClaiming(true);
 
         const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner());
         callContract(
             chainId,
             contract,
-
             "handleRewards",
             [
-                shouldClaimWeth || shouldConvertWeth,
                 shouldConvertWeth,
                 shouldAddIntoQLP,
             ],
             {
-                sentMsg: "Compound submitted!",
-                failMsg: "Compound failed.",
-                successMsg: "Compound completed!",
+                sentMsg: "Claim All submitted!",
+                failMsg: "Claim All failed.",
+                successMsg: "Claim All completed!",
                 setPendingTxns,
             }
         )
@@ -93,37 +90,111 @@ function CompoundModal(props) {
                 setIsVisible(false);
             })
             .finally(() => {
-                setIsCompounding(false);
+                setIsClaiming(false);
             });
     };
 
-    const toggleClaimWeth = (value) => {
-        if (!value) {
-            setShouldClaimWeth(false);
-            setShouldAddIntoQLP(false);
-        }
-        setShouldClaimWeth(value);
+
+    if (isClaim) {
+        return (
+            <button
+                style={{ background: "#448AFF" }}
+                className="Stake-card-option"
+                // disabled={!active || !isClaimableAll(rewardTokens)}
+                // onClick={() => setIsClaimAllModalVisible(true)}
+            >
+                Compound All
+            </button>
+        );
+    } else {
+        return (
+            <button
+                className="App-cta Exchange-swap-button query-modal"
+                onClick={onClickPrimary}
+                disabled={!isPrimaryEnabled()}
+            >
+                {getPrimaryText()}
+            </button>
+        )
+    }
+}
+
+function ClaimAllModal(props) {
+    const {
+        isVisible,
+        setIsVisible,
+        rewardRouterAddress,
+        library,
+        chainId,
+        setPendingTxns,
+        wrappedTokenSymbol,
+        nativeTokenSymbol,
+    } = props;
+    const [isClaiming, setIsClaiming] = useState(false);
+
+    const [shouldConvertWeth, setShouldConvertWeth] = useLocalStorageSerializeKey(
+        [chainId, "Stake-compound-should-convert-weth"],
+        true
+    );
+
+    const [shouldAddIntoQLP, setShouldAddIntoQLP] = useLocalStorageSerializeKey(
+        [chainId, "Stake-compound-should-add-into-qlp"],
+        true
+    );
+
+    const isPrimaryEnabled = () => {
+        return !isClaiming;
     };
 
-    const toggleAddIntoQLP = (value) => {
-        if (value) {
-            setShouldClaimWeth(true);
-            setShouldConvertWeth(false);
+    const getPrimaryText = () => {
+
+        if (isClaiming) {
+            return "Claim All...";
         }
-        setShouldAddIntoQLP(value);
+        return "Claim All";
     };
+
+    const onClickPrimary = () => {
+
+        setIsClaiming(true);
+
+        const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner());
+        callContract(
+            chainId,
+            contract,
+            "handleRewards",
+            [
+                shouldConvertWeth,
+                shouldAddIntoQLP,
+            ],
+            {
+                sentMsg: "Claim All submitted!",
+                failMsg: "Claim All failed.",
+                successMsg: "Claim All completed!",
+                setPendingTxns,
+            }
+        )
+            .then(async (res) => {
+                setIsVisible(false);
+            })
+            .finally(() => {
+                setIsClaiming(false);
+            });
+    };
+
+
 
     return (
         <div className="StakeModal">
-            <Modal isVisible={isVisible} setIsVisible={setIsVisible} label="Compound Rewards">
+            <Modal isVisible={isVisible} setIsVisible={setIsVisible} label="Claim All Rewards">
                 <div className="CompoundModal-menu">
                     <div>
-                        <Checkbox isChecked={shouldClaimWeth} setIsChecked={toggleClaimWeth} disabled={shouldConvertWeth}>
-                            <span style={{ marginLeft: 5 }}>Claim {wrappedTokenSymbol}</span>
+                        <Checkbox isChecked={shouldConvertWeth} setIsChecked={setShouldConvertWeth} disabled={shouldAddIntoQLP}>
+                            <span style={{ marginLeft: 5 }}>Convert {wrappedTokenSymbol} into {nativeTokenSymbol}</span>
                         </Checkbox>
                     </div>
                     <div>
-                        <Checkbox isChecked={shouldAddIntoQLP} setIsChecked={toggleAddIntoQLP}>
+                        <Checkbox isChecked={shouldAddIntoQLP} setIsChecked={setShouldAddIntoQLP}>
                             <span style={{ marginLeft: 5 }}>Compound {wrappedTokenSymbol} into QLP</span>
                         </Checkbox>
                     </div>
@@ -152,13 +223,12 @@ function ClaimModal(props) {
         setPendingTxns,
         nativeTokenSymbol,
         wrappedTokenSymbol,
+        claimToken,
+        isClaiming,
+        setIsClaiming,
+        isClaim
     } = props;
-    const [isClaiming, setIsClaiming] = useState(false);
 
-    const [shouldClaimWeth, setShouldClaimWeth] = useLocalStorageSerializeKey(
-        [chainId, "Stake-claim-should-claim-weth"],
-        true
-    );
     const [shouldConvertWeth, setShouldConvertWeth] = useLocalStorageSerializeKey(
         [chainId, "Stake-claim-should-convert-weth"],
         true
@@ -182,11 +252,10 @@ function ClaimModal(props) {
         callContract(
             chainId,
             contract,
-            "handleRewards",
+            "claim",
             [
-                shouldClaimWeth,
+                claimToken.token.address,
                 shouldConvertWeth,
-                false,
             ],
             {
                 sentMsg: "Claim submitted.",
@@ -203,30 +272,22 @@ function ClaimModal(props) {
             });
     };
 
-    const toggleConvertWeth = (value) => {
-        if (value) {
-            setShouldClaimWeth(true);
-        }
-        setShouldConvertWeth(value);
-    };
+
 
     return (
         <div className="StakeModal">
-            <Modal isVisible={isVisible} setIsVisible={setIsVisible} label="Claim Rewards">
-                <div className="CompoundModal-menu">
-                    <div>
-                        <Checkbox isChecked={shouldClaimWeth} setIsChecked={setShouldClaimWeth} disabled={shouldConvertWeth}>
-                            <span style={{ marginLeft: 12 }}>Claim {wrappedTokenSymbol}</span>
-                        </Checkbox>
-                    </div>
-                    <div>
-                        <Checkbox isChecked={shouldConvertWeth} setIsChecked={toggleConvertWeth}>
-                            <span style={{ marginLeft: 12 }}>
-                                Convert {wrappedTokenSymbol} into {nativeTokenSymbol}
-                            </span>
-                        </Checkbox>
-                    </div>
-                </div>
+            <Modal isVisible={isVisible} setIsVisible={setIsVisible} label={`Claim ${claimToken ? claimToken.token.symbol : ""} Rewards`}>
+                {claimToken && claimToken.token.symbol === wrappedTokenSymbol &&
+                    (<div className="CompoundModal-menu">
+                        <div>
+                            <Checkbox isChecked={shouldConvertWeth} setIsChecked={setShouldConvertWeth}>
+                                <span style={{ marginLeft: 12 }}>
+                                    Convert {wrappedTokenSymbol} into {nativeTokenSymbol}
+                                </span>
+                            </Checkbox>
+                        </div>
+                    </div>)
+                }
                 <div className="Exchange-swap-button-container">
                     <button className="App-cta Exchange-swap-button query-modal" onClick={onClickPrimary} disabled={!isPrimaryEnabled()}>
                         {getPrimaryText()}
@@ -241,10 +302,12 @@ export default function Stake({ setPendingTxns, connectWallet }) {
     const { active, library, account } = useWeb3React();
     const { chainId } = useChainId();
 
-    const hasInsurance = false;
-
-    const [isCompoundModalVisible, setIsCompoundModalVisible] = useState(false);
+    const [isClaimAllModalVisible, setIsClaimAllModalVisible] = useState(false);
     const [isClaimModalVisible, setIsClaimModalVisible] = useState(false);
+    const [claimToken, setClaimToken] = useState();
+    const [isClaiming, setIsClaiming] = useState(false);
+
+    const [isClaim, setIsClaim] = useState();
 
     const rewardRouterAddress = getContract(chainId, "RewardRouter");
     const rewardReaderAddress = getContract(chainId, "RewardReader");
@@ -308,6 +371,45 @@ export default function Stake({ setPendingTxns, connectWallet }) {
         }
     );
 
+    const { infoTokens } = useInfoTokens(library, chainId, active, undefined, undefined);
+
+    const quickPrice = useCoingeckoPrices("QUICK");
+
+    const { data: claimableAll } = useSWR(
+        [`Stake:stakingInfo:${active}`, chainId, feeQlpTrackerAddress, "claimableAll", account || PLACEHOLDER_ACCOUNT],
+        {
+            fetcher: fetcher(library, FeeQlpTracker, []),
+        }
+    );
+
+    const rewardTokens = useMemo(() => {
+        if (!Array.isArray(claimableAll) || claimableAll.length !== 2) return [];
+        const [claimableTokens, claimableRewards] = claimableAll
+        console.log(claimableTokens);
+        console.log(claimableRewards);
+        const result = [];
+        for (let i = 0; i < claimableTokens.length; i++) {
+            const reward = claimableRewards[i];
+            if (claimableTokens[i] === getContract(chainId, "QUICK")) {
+                result.push({ token: { address: claimableTokens[i], symbol: "QUICK" }, reward, rewardInUsd: quickPrice.mul(reward).div(expandDecimals(1, 18)) });
+            } else {
+                const token = infoTokens[claimableTokens[i]];
+                if (token) {
+                    result.push({ token, reward, rewardInUsd: token.maxPrice && token.maxPrice.mul(reward).div(expandDecimals(1, token.decimals)) });
+                }
+            }
+        }
+        return result;
+    }, [claimableAll, chainId, quickPrice, infoTokens])
+
+    let isClaimable = (rewardToken) => {
+        return rewardToken && rewardToken.reward && rewardToken.reward.gt(0)
+    };
+
+    let isClaimableAll = (rewardTokens) => {
+        return rewardTokens && Array.isArray(rewardTokens) && rewardTokens.some(r => r.reward && r.reward.gt(0));
+    };
+
     const { data: aums } = useSWR([`Stake:getAums:${active}`, chainId, qlpManagerAddress, "getAums"], {
         fetcher: fetcher(library, QlpManager),
     });
@@ -337,44 +439,22 @@ export default function Stake({ setPendingTxns, connectWallet }) {
         nativeTokenPrice,
     );
 
-    let totalRewardTokensAndQlp;
-    if (processedData && processedData.qlpBalance) {
-        totalRewardTokensAndQlp = processedData.qlpBalance;
-    }
-
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    let earnMsg;
-    let isClaimable = false;
-    if (totalRewardTokensAndQlp && totalRewardTokensAndQlp.gt(0)) {
-
-        let qlpStr;
-        if (processedData.qlpBalance && processedData.qlpBalance.gt(0)) {
-            qlpStr = formatAmount(processedData.qlpBalance, 18, 2, true) + " QLP";
-            isClaimable = true;
-        }
-        const amountStr = [qlpStr].filter((s) => s).join(", ");
-        earnMsg = (
-            <div>
-                You earn {nativeTokenSymbol} rewards with {formatAmount(totalRewardTokensAndQlp, 18, 2, true)} tokens.
-                <br />
-                Tokens: {amountStr}.
-            </div>
-        );
-    }
 
     return (
         <div>
-            <CompoundModal
+            <ClaimAllModal
                 setPendingTxns={setPendingTxns}
-                isVisible={isCompoundModalVisible}
-                setIsVisible={setIsCompoundModalVisible}
+                isVisible={isClaimAllModalVisible}
+                setIsVisible={setIsClaimAllModalVisible}
                 rewardRouterAddress={rewardRouterAddress}
                 wrappedTokenSymbol={wrappedTokenSymbol}
                 nativeTokenSymbol={nativeTokenSymbol}
+                isClaim={isClaim}
                 library={library}
                 chainId={chainId}
             />
@@ -388,60 +468,79 @@ export default function Stake({ setPendingTxns, connectWallet }) {
                 totalVesterRewards={processedData.totalVesterRewards}
                 wrappedTokenSymbol={wrappedTokenSymbol}
                 nativeTokenSymbol={nativeTokenSymbol}
+                isClaim={isClaim}
                 library={library}
                 chainId={chainId}
+                claimToken={claimToken}
+                isClaiming={isClaiming}
+                setIsClaiming={setIsClaiming}
             />
             <div className="Stake-cards">
                 <div className="Stake-card-title">
                     <div className="Stake-card-title-mark">Earned</div>
-                    <div className="Stake-card-title-mark-label">
-                        {formatKeyAmount(processedData, "feeQlpTrackerRewards", 18, 2, true)}{'\u00A0'}
-                        {wrappedTokenSymbol}{'\u00A0'}
-                        ($
-                        {formatKeyAmount(processedData, "feeQlpTrackerRewardsUsd", USD_DECIMALS, 2, true)})
-                    </div>
                 </div>
-                <div className="Stake-card-action">
-                    {active && isClaimable && (
-                        <button
-                            style={{ background: "#448AFF" }}
-                            className="Stake-card-option"
-                            onClick={() => setIsCompoundModalVisible(true)}
-                        >
-                            Compound
-                        </button>
-                    )}
-                    {(!active || !isClaimable) && (
-                        <button
-                            style={{ background: "#3E4252" }}
-                            className="Stake-card-option"
-                            disabled
-                            onClick={() => setIsCompoundModalVisible(true)}
-                        >
-                            Compound
-                        </button>
-                    )}
 
-                    {active && isClaimable && (
-                        <button
-                            style={{ background: "#448AFF3D" }}
-                            className="Stake-card-option"
-                            onClick={() => setIsClaimModalVisible(true)}
-                        >
-                            Claim
-                        </button>
-                    )}
-                    {(!active || !isClaimable) && (
-                        <button
-                            style={{ background: "#3E4252" }}
-                            className="Stake-card-option"
-                            disabled
-                            onClick={() => setIsClaimModalVisible(true)}
-                        >
-                            Claim
-                        </button>
-                    )}
+                <div className="Stake-card-action">
+                    <button
+                        style={{ background: "#448AFF" }}
+                        className="Stake-card-option"
+                        disabled={!active || !isClaimableAll(rewardTokens)}
+                        onClick={() => setIsClaimAllModalVisible(true)}
+                    >
+                        Claim All
+                    </button>
+                    {/* <button className="Stake-card-option" onClick={onClickPrimary} disabled={!isPrimaryEnabled()}>
+                        {getPrimaryText()}
+                    </button> */}
+                    <button
+                        style={{ background: "#448AFF" }}
+                        className="Stake-card-option"
+                        disabled={!active || !isClaimableAll(rewardTokens)}
+                        onClick={() => setIsClaimAllModalVisible(true)}
+                    >
+                        Compound All
+                    </button>
                 </div>
+                {rewardTokens && rewardTokens.map((rewardToken) => (
+                    <>
+                        <div className="Stake-card-title">
+                            <div className="Stake-card-title-mark-label">
+                                {formatAmount(rewardToken.reward, rewardToken.token.decimals, 4, true)}{'\u00A0'}
+                                {rewardToken.token.symbol}{'\u00A0'}
+                                ($
+                                {formatAmount(rewardToken.rewardInUsd, USD_DECIMALS, 4, true)})
+                            </div>
+                        </div>
+                        <div className="Stake-card-action">
+                            <button
+                                style={{ background: "#3E4252" }}
+                                className="Stake-card-option"
+                                disabled={!active || !isClaimable(rewardToken)}
+                                onClick={() => {
+                                    setIsClaim(true);
+                                    setClaimToken(rewardToken);
+                                    setIsClaimModalVisible(true);
+                                }}
+                            >
+                                Claim
+                            </button>
+                            {rewardToken.token.symbol !== "QUICK" && (
+                                <button
+                                    style={{ background: "#3E4252" }}
+                                    className="Stake-card-option"
+                                    disabled={!active || !isClaimable(rewardToken)}
+                                    onClick={() => {
+                                        setClaimToken(rewardToken);
+                                        setIsClaim(false);
+                                        setIsClaimModalVisible(true);
+                                    }}
+                                >
+                                    Compound
+                                </button>
+                            )}
+                        </div>
+                    </>
+                ))}
             </div>
         </div>
     );
