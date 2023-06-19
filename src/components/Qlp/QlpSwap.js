@@ -123,9 +123,10 @@ export default function QlpSwap(props) {
   const stakedQlpTrackerAddress = getContract(chainId, "StakedQlpTracker");
   const feeQlpTrackerAddress = getContract(chainId, "FeeQlpTracker");
   const usdqAddress = getContract(chainId, "USDQ");
+  const qlpAddress = getContract(chainId, "QLP");
   const qlpManagerAddress = getContract(chainId, "QlpManager");
   const rewardRouterAddress = getContract(chainId, "RewardRouter");
-  const tokensForBalanceAndSupplyQuery = [stakedQlpTrackerAddress, usdqAddress];
+  const tokensForBalanceAndSupplyQuery = [qlpAddress, usdqAddress];
 
   const tokenAddresses = tokens.map((token) => token.address);
   const { data: tokenBalances } = useSWR(
@@ -180,6 +181,12 @@ export default function QlpSwap(props) {
       fetcher: fetcher(library, RewardTracker),
     }
   );
+  const { data: oldQlpBalance } = useSWR(
+    [`QlpSwap:oldQlpBalance:${active}`, chainId, stakedQlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT],
+    {
+      fetcher: fetcher(library, RewardTracker),
+    }
+  );
 
 
 
@@ -208,8 +215,12 @@ export default function QlpSwap(props) {
       ? aum.mul(expandDecimals(1, QLP_DECIMALS)).div(qlpSupply)
       : expandDecimals(1, USD_DECIMALS);
   let qlpBalanceUsd;
+  let oldQlpBalanceUsd;
   if (qlpBalance) {
     qlpBalanceUsd = qlpBalance.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
+  }
+  if (oldQlpBalance) {
+    oldQlpBalanceUsd = oldQlpBalance.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
   }
   const qlpSupplyUsd = qlpSupply.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
 
@@ -696,6 +707,13 @@ export default function QlpSwap(props) {
               <div className="value">
                 {formatAmount(qlpBalance, QLP_DECIMALS, 4, true)} QLP ($
                 {formatAmount(qlpBalanceUsd, USD_DECIMALS, 2, true)})
+              </div>
+            </div>            
+            <div className="App-card-row">
+              <div className="label">Old Wallet</div>
+              <div className="value">
+                {formatAmount(oldQlpBalance, QLP_DECIMALS, 4, true)} QLP ($
+                {formatAmount(oldQlpBalanceUsd, USD_DECIMALS, 2, true)})
               </div>
             </div>
           </div>
