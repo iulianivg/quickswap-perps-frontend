@@ -324,6 +324,7 @@ export default function PositionEditor(props) {
 
     const contract = new ethers.Contract(positionRouterAddress, PositionRouter.abi, library.getSigner());
     callContract(chainId, contract, method, params, {
+      gasLimit: bigNumberify(600000),
       value,
       sentMsg: "Deposit submitted.",
       successMsg: `Requested deposit of ${formatAmount(fromAmount, position.collateralToken.decimals, 4)} ${
@@ -378,6 +379,7 @@ export default function PositionEditor(props) {
 
     const contract = new ethers.Contract(positionRouterAddress, PositionRouter.abi, library.getSigner());
     callContract(chainId, contract, method, params, {
+      gasLimit: bigNumberify(500000),
       value: minExecutionFee,
       sentMsg: "Withdrawal submitted.",
       successMsg: `Requested withdrawal of ${formatAmount(fromAmount, USD_DECIMALS, USD_DISPLAY_DECIMALS)} USD from ${

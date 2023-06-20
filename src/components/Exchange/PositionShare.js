@@ -43,8 +43,9 @@ function PositionShare({ setIsPositionShareModalOpen, isPositionShareModalOpen, 
   const [, copyToClipboard] = useCopyToClipboard();
   const positionRef = useRef();
   const tweetLink = getTwitterIntentURL(
-    `Latest $${positionToShare?.indexToken?.symbol} trade on @QuickperpTRADE`,
-    getShareURL(uploadedImageInfo, userAffiliateCode)
+    `Latest $${positionToShare?.indexToken?.symbol} trade on @QuickswapDEX`,
+    getShareURL(uploadedImageInfo, userAffiliateCode),
+    "Polygon,zkEVM"
   );
 
   console.log("tweetLink", tweetLink);

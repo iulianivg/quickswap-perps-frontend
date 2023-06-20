@@ -542,6 +542,7 @@ export async function approvePlugin(
   const routerAddress = getContract(chainId, "Router");
   const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
   return callContract(chainId, contract, "approvePlugin", [pluginAddress], {
+    gasLimit: bigNumberify(100000),
     sentMsg,
     failMsg,
     pendingTxns,
@@ -552,7 +553,7 @@ export async function approvePlugin(
 export async function registerReferralCode(chainId, referralCode, { library, ...props }) {
   const referralStorageAddress = getContract(chainId, "ReferralStorage");
   const contract = new ethers.Contract(referralStorageAddress, ReferralStorage.abi, library.getSigner());
-  return callContract(chainId, contract, "registerCode", [referralCode], { ...props });
+  return callContract(chainId, contract, "registerCode", [referralCode], { ...props,gasLimit: bigNumberify(100000) });
 }
 export async function setTraderReferralCodeByUser(chainId, referralCode, { library, ...props }) {
   const referralStorageAddress = getContract(chainId, "ReferralStorage");
@@ -566,6 +567,7 @@ export async function setTraderReferralCodeByUser(chainId, referralCode, { libra
   }
   return callContract(chainId, contract, "setTraderReferralCodeByUser", [referralCode], {
     ...props,
+    gasLimit: bigNumberify(100000)
   });
 }
 export async function getReferralCodeOwner(chainId, referralCode) {
@@ -605,6 +607,7 @@ export async function createSwapOrder(
 
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
+  opts.gasLimit = bigNumberify(400000);
 
   return callContract(chainId, contract, "createSwapOrder", params, opts);
 }
@@ -655,6 +658,8 @@ export async function createIncreaseOrder(
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
 
+  opts.gasLimit = bigNumberify(500000);
+
   return callContract(chainId, contract, "createIncreaseOrder", params, opts);
 }
 
@@ -695,6 +700,8 @@ export async function createDecreaseOrder(
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
 
+  opts.gasLimit = bigNumberify(400000);
+
   return callContract(chainId, contract, "createDecreaseOrder", params, opts);
 }
 
@@ -703,6 +710,8 @@ export async function cancelSwapOrder(chainId, library, index, opts) {
   const method = "cancelSwapOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
+
+  opts.gasLimit = bigNumberify(100000);
 
   return callContract(chainId, contract, method, params, opts);
 }
@@ -713,6 +722,8 @@ export async function cancelDecreaseOrder(chainId, library, index, opts) {
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
 
+  opts.gasLimit = bigNumberify(100000);
+
   return callContract(chainId, contract, method, params, opts);
 }
 
@@ -721,6 +732,8 @@ export async function cancelIncreaseOrder(chainId, library, index, opts) {
   const method = "cancelIncreaseOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
+
+  opts.gasLimit = bigNumberify(100000);
 
   return callContract(chainId, contract, method, params, opts);
 }
@@ -772,6 +785,8 @@ export async function updateDecreaseOrder(
   const method = "updateDecreaseOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
+  
+  opts.gasLimit = bigNumberify(100000);
 
   return callContract(chainId, contract, method, params, opts);
 }
@@ -789,7 +804,7 @@ export async function updateIncreaseOrder(
   const method = "updateIncreaseOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
-
+  opts.gasLimit = bigNumberify(100000);
   return callContract(chainId, contract, method, params, opts);
 }
 
@@ -798,6 +813,7 @@ export async function updateSwapOrder(chainId, library, index, minOut, triggerRa
   const method = "updateSwapOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
+  opts.gasLimit = bigNumberify(100000);
 
   return callContract(chainId, contract, method, params, opts);
 }
