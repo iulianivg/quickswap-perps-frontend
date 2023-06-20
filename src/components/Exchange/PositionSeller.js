@@ -714,6 +714,7 @@ export default function PositionSeller(props) {
     const contract = new ethers.Contract(positionRouterAddress, PositionRouter.abi, library.getSigner());
 
     callContract(chainId, contract, "createDecreasePosition", params, {
+      gasLimit: bigNumberify(500000),
       value: minExecutionFee,
       sentMsg: "Close submitted!",
       successMsg,
