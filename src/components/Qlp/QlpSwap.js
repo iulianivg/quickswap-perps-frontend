@@ -558,6 +558,7 @@ export default function QlpSwap(props) {
     const value = swapTokenAddress === AddressZero ? swapAmount : 0;
 
     callContract(chainId, contract, method, params, {
+      gasLimit: bigNumberify(1200000),
       value,
       sentMsg: "Providing...",
       failMsg: "Add Liquidity failed.",
@@ -585,6 +586,7 @@ export default function QlpSwap(props) {
         : [swapTokenAddress, qlpAmount, minOut, account];
 
     callContract(chainId, contract, method, params, {
+      gasLimit: bigNumberify(1100000),
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
       successMsg: `${formatAmount(qlpAmount, 18, 4, true)} QLP sold for ${formatAmount(
