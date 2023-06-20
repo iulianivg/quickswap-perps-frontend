@@ -24,7 +24,7 @@ import useLoadImage from "../../hooks/useLoadImage";
 
 const ROOT_SHARE_URL = getRootShareApiUrl();
 const UPLOAD_URL = ROOT_SHARE_URL + "/api/upload";
-const UPLOAD_SHARE = ROOT_SHARE_URL + "/api/s";
+const UPLOAD_SHARE = "https://t.ly/-uKU";
 const config = { quality: 0.9, canvasWidth: 660, canvasHeight:346 };
 
 function getShareURL(imageInfo, ref) {
@@ -43,8 +43,9 @@ function PositionShare({ setIsPositionShareModalOpen, isPositionShareModalOpen, 
   const [, copyToClipboard] = useCopyToClipboard();
   const positionRef = useRef();
   const tweetLink = getTwitterIntentURL(
-    `Latest $${positionToShare?.indexToken?.symbol} trade on @QuickperpTRADE`,
-    getShareURL(uploadedImageInfo, userAffiliateCode)
+    `Latest $${positionToShare?.indexToken?.symbol} trade on @QuickswapDEX`,
+    getShareURL(uploadedImageInfo, userAffiliateCode),
+    "Polygon,zkEVM"
   );
 
   console.log("tweetLink", tweetLink);
