@@ -30,6 +30,8 @@ import { getConstant } from "../../Constants";
 import useSWR from "swr";
 import { getContract } from "../../Addresses";
 import "./Stake.css";
+import TooltipWithPortal from "../../components/Tooltip/TooltipWithPortal";
+import Tooltip from "../../components/Tooltip/Tooltip";
 
 
 function ClaimAllModal(props) {
@@ -201,7 +203,7 @@ function ClaimModal(props) {
     );
 }
 
-export default function Stake({ setPendingTxns, connectWallet }) {
+export default function Stake({ setPendingTxns, connectWallet, rewardTokens }) {
     const { active, library, account } = useWeb3React();
     const { chainId } = useChainId();
 
@@ -275,36 +277,7 @@ export default function Stake({ setPendingTxns, connectWallet }) {
         }
     );
 
-    const { infoTokens } = useInfoTokens(library, chainId, active, undefined, undefined);
 
-    const quickPrice = useCoingeckoPrices("QUICK");
-
-    const { data: claimableAll } = useSWR(
-        [`Stake:claimableAll:${active}`, chainId, feeQlpTrackerAddress, "claimableAll", account || PLACEHOLDER_ACCOUNT],
-        {
-            fetcher: fetcher(library, FeeQlpTracker, []),
-        }
-    );
-
-    const rewardTokens = useMemo(() => {
-        if (!Array.isArray(claimableAll) || claimableAll.length !== 2) return [];
-        const [claimableTokens, claimableRewards] = claimableAll
-        console.log(claimableTokens);
-        console.log(claimableRewards);
-        const result = [];
-        for (let i = 0; i < claimableTokens.length; i++) {
-            const reward = claimableRewards[i];
-            if (claimableTokens[i] === getContract(chainId, "QUICK")) {
-                result.push({ token: { address: claimableTokens[i], symbol: "QUICK" }, reward, rewardInUsd: quickPrice.mul(reward).div(expandDecimals(1, 18)) });
-            } else {
-                const token = infoTokens[claimableTokens[i]];
-                if (token) {
-                    result.push({ token, reward, rewardInUsd: token.maxPrice && token.maxPrice.mul(reward).div(expandDecimals(1, token.decimals)) });
-                }
-            }
-        }
-        return result;
-    }, [claimableAll, chainId, quickPrice, infoTokens])
 
     let isClaimable = (rewardToken) => {
         return rewardToken && rewardToken.reward && rewardToken.reward.gt(0)
@@ -464,7 +437,7 @@ export default function Stake({ setPendingTxns, connectWallet }) {
                     {/* <button className="Stake-card-option" onClick={onClickPrimary} disabled={!isPrimaryEnabled()}>
                         {getPrimaryText()}
                     </button> */}
-                    <button
+                    {/* <button
                         title="In case the reward token is in the pool, it will be added to the QLP"
                         style={{ background: "#448AFF" }}
                         className="Stake-card-option"
@@ -475,7 +448,27 @@ export default function Stake({ setPendingTxns, connectWallet }) {
                         }}
                     >
                         {isCompoundAll ? "Compounding..." : "Compound All"}
-                    </button>
+                    </button> */}
+
+                    <Tooltip
+                        handle={
+                            <button
+                                style={{ background: "#448AFF" }}
+                                className="Stake-card-option"
+                                disabled={!active || !isClaimableAll(rewardTokens)}
+                                onClick={() => {
+                                    setIsClaim(false);
+                                    compoundAll()
+                                }}
+                            >
+                                {isCompoundAll ? "Compounding..." : "Compound All"}
+                            </button>
+                        }
+                        renderContent= {()=> "In case the reward token is in the pool, it will be added to the QLP"}
+                        position="right-bottom"
+                    >
+
+                    </Tooltip>
                 </div>
                 {rewardTokens && rewardTokens.map((rewardToken) => (
                     <>

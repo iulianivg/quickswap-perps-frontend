@@ -10,6 +10,7 @@ import Router from "../abis/Router.json";
 import VaultReader from "../abis/VaultReader.json";
 import ReferralStorage from "../abis/ReferralStorage.json";
 import PositionRouter from "../abis/PositionRouter.json";
+import FeeQlpDistributor from "../abis/FeeQlpDistributor.json";
 
 import { getContract,  } from "../Addresses";
 import { getConstant } from "../Constants";
@@ -207,6 +208,34 @@ export function useUserStat(chainId) {
 
   return res ? res.data.userStat : null;
 }
+
+export function useAllTokensPerInterval(library, chainId) {
+  const [allTokensPerInterval, setAllTokensPerInterval] = useState([]);
+  useEffect(() => {
+    const provider = getProvider(library, chainId);
+    const feeQlpDistributorAddress = getContract(chainId, "FeeQlpDistributor");
+    const contract = new ethers.Contract(feeQlpDistributorAddress, FeeQlpDistributor.abi, provider);
+    const _allTokensPerInterval = []
+    contract.getAllRewardTokens().then(tokens => {
+      console.log("useAllTokensPerInterval", tokens);
+      for (let i = 0; i < tokens.length; i++) {
+        const tokenAddress = tokens[i];
+        contract.tokensPerInterval(tokenAddress).then(tokensPerInterval => {
+          console.log("tokensPerInterval", tokensPerInterval);
+          _allTokensPerInterval.push([tokenAddress, tokensPerInterval])
+          if (_allTokensPerInterval.length === tokens.length) {
+            setAllTokensPerInterval(_allTokensPerInterval);
+          }
+        })
+      }
+    })
+      .catch((e) => { console.log("e", e) });
+  }, [setAllTokensPerInterval, library, chainId])
+
+  return [allTokensPerInterval, setAllTokensPerInterval]
+}
+
+
 
 export function useLiquidationsData(chainId, account) {
   const [data, setData] = useState(null);

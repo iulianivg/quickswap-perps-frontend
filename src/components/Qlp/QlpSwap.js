@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useHistory } from "react-router-dom";
 
 import { useWeb3React } from "@web3-react/core";
@@ -42,7 +42,7 @@ import {
   QPXQLP_DISPLAY_DECIMALS,
 } from "../../Helpers";
 
-import { callContract, useInfoTokens, useQuickInfo } from "../../Api";
+import { callContract, useAllTokensPerInterval, useInfoTokens, useQuickInfo } from "../../Api";
 
 import TokenSelector from "../Exchange/TokenSelector";
 import BuyInputSection from "../BuyInputSection/BuyInputSection";
@@ -55,6 +55,7 @@ import QlpManager from "../../abis/QlpManager.json";
 import RewardTracker from "../../abis/RewardTracker.json";
 import RewardRouter from "../../abis/RewardRouter.json";
 import Token from "../../abis/Token.json";
+import FeeQlpTracker from "../../abis/FeeQlpTracker.json";
 
 import qlp24Icon from "../../img/ic_qlp_24.svg";
 import qlp40Icon from "../../assets/icons/qlpCoin.svg";
@@ -64,8 +65,6 @@ import "./QlpSwap.css";
 import AssetDropdown from "../../views/Dashboard/AssetDropdown";
 import { getImageUrl } from "../../cloudinary/getImageUrl";
 import Stake from "../../views/Stake/Stake";
-import AIRDROPAPR from "../../assets/icons/airdropAPR.jpg";
-import TooltipWithPortal from "../Tooltip/TooltipWithPortal";
 
 const { AddressZero } = ethers.constants;
 
@@ -272,61 +271,126 @@ export default function QlpSwap(props) {
   const nativeToken = getTokenInfo(infoTokens, AddressZero);
 
   const quickInfo = useQuickInfo(POLYGON_ZKEVM);
-  const quickPrice = quickInfo ? Number(quickInfo.derivedMatic) * Number(formatAmount(nativeToken.minPrice, USD_DECIMALS, 6)) : 0;
+  // let quickPrice = quickInfo ? Number(quickInfo.derivedMatic) * Number(formatAmount(nativeToken.minPrice, USD_DECIMALS, 6)) : 0;
 
-  const quickAPR = useMemo(() => {
-    if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
-      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
-      return quickPrice * 6000000 * 365 / qlpSupplyNumber
+  const quickPrice = (quickInfo && nativeToken && nativeToken.minPrice) ? nativeToken.minPrice.mul(Math.round(Number(quickInfo.derivedMatic) * 10 ** 8 * 10 ** 8)).div(10 ** 8).div(10 ** 8) : bigNumberify(0);
+
+  // const quickAPR = useMemo(() => {
+  //   if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
+  //     const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
+  //     return quickPrice * 6000000 * 365 / qlpSupplyNumber
+  //   }
+  //   return 0
+  // }, [quickPrice, qlpSupplyUsd]);
+
+  // const usdcAPR = useMemo(() => {
+  //   if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
+  //     const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
+  //     return 15000 * 365 * 100 / (7 * qlpSupplyNumber)
+  //   }
+  //   return 0
+  // }, [quickPrice, qlpSupplyUsd]);
+
+  let totalApr = useRef(bigNumberify(0));
+  let totalRewardsInUsd = useRef(bigNumberify(0));
+
+  // let feeQlpTrackerAnnualRewardsUsd;
+  // let feeQlpTrackerApr;
+  // if (
+  //   stakingData &&
+  //   stakingData.feeQlpTracker &&
+  //   stakingData.feeQlpTracker.tokensPerInterval &&
+  //   nativeToken &&
+  //   nativeToken.minPrice &&
+  //   qlpSupplyUsd &&
+  //   qlpSupplyUsd.gt(0)
+  // ) {
+  //   feeQlpTrackerAnnualRewardsUsd = stakingData.feeQlpTracker.tokensPerInterval
+  //     .mul(SECONDS_PER_YEAR)
+  //     .mul(nativeToken.minPrice)
+  //     .div(expandDecimals(1, 18));
+  //   feeQlpTrackerApr = feeQlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(qlpSupplyUsd);
+  //   totalApr = totalApr.add(feeQlpTrackerApr);
+  // }
+
+  // let stakedQlpTrackerAnnualRewardsUsd;
+  // let stakedQlpTrackerApr;
+
+  // if (
+  //   stakingData &&
+  //   stakingData.stakedQlpTracker &&
+  //   stakingData.stakedQlpTracker.tokensPerInterval &&
+  //   qlpSupplyUsd &&
+  //   qlpSupplyUsd.gt(0)
+  // ) {
+  //   stakedQlpTrackerAnnualRewardsUsd = stakingData.stakedQlpTracker.tokensPerInterval
+  //     .mul(SECONDS_PER_YEAR)
+  //     .div(expandDecimals(1, 18));
+  //   stakedQlpTrackerApr = stakedQlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(qlpSupplyUsd);
+  //   totalApr = totalApr.add(stakedQlpTrackerApr);
+  // }
+
+
+  // const quickPrice = useCoingeckoPrices("QUICK");
+
+  const { data: claimableAll } = useSWR(
+    [`Stake:claimableAll:${active}`, chainId, feeQlpTrackerAddress, "claimableAll", account || PLACEHOLDER_ACCOUNT],
+    {
+      fetcher: fetcher(library, FeeQlpTracker, []),
     }
-    return 0
-  }, [quickPrice, qlpSupplyUsd]);
+  );
 
-  const usdcAPR = useMemo(() => {
-    if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
-      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
-      return 15000 * 365 * 100 / (7 * qlpSupplyNumber)
+
+  const [allTokensPerInterval,] = useAllTokensPerInterval(library, chainId)
+  console.log("🚀 allTokensPerInterval:", allTokensPerInterval)
+
+
+  const apr = useMemo(() => {
+    let annualRewardsInUsd = bigNumberify(0);
+    if (!Array.isArray(allTokensPerInterval) && allTokensPerInterval.length === 0) return;
+    if (qlpSupply.eq(0)) return;
+    for (let i = 0; i < allTokensPerInterval.length; i++) {
+      const [tokenAddress, tokensPerInterval] = allTokensPerInterval[i];
+      let tokenPrice = bigNumberify(0)
+      let tokenDecimals = 18;
+      if (tokenAddress === getContract(chainId, "QUICK")) {
+        tokenPrice = quickPrice;
+      } else {
+        const token = infoTokens[tokenAddress];
+        if (token && token.maxPrice) {
+          tokenPrice = token.maxPrice;
+          tokenDecimals = token.decimals
+        }
+      }
+
+      const tokenAnnualRewardsInUsd = tokenPrice.mul(tokensPerInterval).mul(86400).mul(365).div(expandDecimals(1, 30)).div(expandDecimals(1, tokenDecimals))
+      annualRewardsInUsd = annualRewardsInUsd.add(tokenAnnualRewardsInUsd);
     }
-    return 0
-  }, [quickPrice, qlpSupplyUsd]);
+    const apr = annualRewardsInUsd.mul(10000).mul(expandDecimals(1, USD_DECIMALS)).div(qlpPrice).div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)))
+    return apr.toNumber() / 100;
+  }, [allTokensPerInterval, quickPrice, infoTokens, qlpSupply, qlpPrice, chainId])
 
-  let totalApr = bigNumberify(0);
-
-  let feeQlpTrackerAnnualRewardsUsd;
-  let feeQlpTrackerApr;
-  if (
-    stakingData &&
-    stakingData.feeQlpTracker &&
-    stakingData.feeQlpTracker.tokensPerInterval &&
-    nativeToken &&
-    nativeToken.minPrice &&
-    qlpSupplyUsd &&
-    qlpSupplyUsd.gt(0)
-  ) {
-    feeQlpTrackerAnnualRewardsUsd = stakingData.feeQlpTracker.tokensPerInterval
-      .mul(SECONDS_PER_YEAR)
-      .mul(nativeToken.minPrice)
-      .div(expandDecimals(1, 18));
-    feeQlpTrackerApr = feeQlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(qlpSupplyUsd);
-    totalApr = totalApr.add(feeQlpTrackerApr);
-  }
-
-  let stakedQlpTrackerAnnualRewardsUsd;
-  let stakedQlpTrackerApr;
-
-  if (
-    stakingData &&
-    stakingData.stakedQlpTracker &&
-    stakingData.stakedQlpTracker.tokensPerInterval &&
-    qlpSupplyUsd &&
-    qlpSupplyUsd.gt(0)
-  ) {
-    stakedQlpTrackerAnnualRewardsUsd = stakingData.stakedQlpTracker.tokensPerInterval
-      .mul(SECONDS_PER_YEAR)
-      .div(expandDecimals(1, 18));
-    stakedQlpTrackerApr = stakedQlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(qlpSupplyUsd);
-    totalApr = totalApr.add(stakedQlpTrackerApr);
-  }
+  const rewardTokens = useMemo(() => {
+    if (!Array.isArray(claimableAll) || claimableAll.length !== 2) return [];
+    const [claimableTokens, claimableRewards] = claimableAll
+    const result = [];
+    for (let i = 0; i < claimableTokens.length; i++) {
+      const reward = claimableRewards[i];
+      if (claimableTokens[i] === getContract(chainId, "QUICK")) {
+        const rewardInUsd = quickPrice.mul(reward).div(expandDecimals(1, 18))
+        totalRewardsInUsd.current = totalRewardsInUsd.current.add(rewardInUsd);
+        totalApr.current = totalRewardsInUsd.current.mul
+        result.push({ token: { address: claimableTokens[i], symbol: "QUICK" }, reward, rewardInUsd });
+      } else {
+        const token = infoTokens[claimableTokens[i]];
+        if (token) {
+          const rewardInUsd = token.maxPrice && token.maxPrice.mul(reward).div(expandDecimals(1, token.decimals))
+          result.push({ token, reward, rewardInUsd });
+        }
+      }
+    }
+    return result;
+  }, [claimableAll, chainId, quickPrice, infoTokens])
 
   useEffect(() => {
     const updateSwapAmounts = () => {
@@ -590,8 +654,6 @@ export default function QlpSwap(props) {
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner());
     const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemQlpETH" : "unstakeAndRedeemQlp";
-    console.log("🚀 ~ file: QlpSwap.js:574 ~ sellQlp ~ swapTokenAddress:", swapTokenAddress)
-    console.log("🚀 ~ file: QlpSwap.js:574 ~ sellQlp ~ method:", method)
 
     const params =
       swapTokenAddress === AddressZero
@@ -773,15 +835,8 @@ export default function QlpSwap(props) {
                 <div className="label">APR</div>
                 <div className="value flex">
                   <span className="positive" style={{ marginRight: 6 }}>
-                    {(Number(formatAmount(totalApr, 2, 18, true)) + quickAPR + usdcAPR).toLocaleString()}%
+                    {apr || "..."}%
                   </span>
-                  <TooltipWithPortal
-                    handle={<img src={AIRDROPAPR} alt='airdrop APR' width={24} />}
-                    position="right-bottom"
-                    renderContent={
-                      () => <>Eth fee APR: {formatAmount(totalApr, 2, 2, true)}%<br/><br/>Quick airdrop APR: {quickAPR.toLocaleString()}%<br/><br/>USDC airdrop APR: {usdcAPR.toLocaleString()}%</>
-                    }
-                  />
                   {/* <Tooltip
                     className="positive"
                     handle={`${formatAmount(totalApr, 2, 2, true)}%`}
@@ -1008,7 +1063,7 @@ export default function QlpSwap(props) {
           </div>
         </div>
       </div>
-      <Stake />
+      <Stake rewardTokens={rewardTokens} />
       <div className="Tab-title-section" style={{ marginLeft: -12 }}>
         <div className="Page-title">Save Fees</div>
         {isBuying && (
