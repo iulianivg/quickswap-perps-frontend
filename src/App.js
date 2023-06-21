@@ -169,7 +169,7 @@ function AppHeaderLinks({ small, openSettings, clickCloseIcon }) {
           </NavLink>
       </div>
       <div className="App-header-link-container">
-        <a href="https://quickswap.exchange/#/pool" target='_blank' rel="noreferrer">
+        <a href="https://quickswap.exchange/#/pools" target='_blank' rel="noreferrer">
           Pool
         </a>
       </div>
