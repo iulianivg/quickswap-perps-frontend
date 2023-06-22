@@ -711,7 +711,7 @@ export async function cancelSwapOrder(chainId, library, index, opts) {
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
 
-  opts.gasLimit = bigNumberify(100000);
+  opts.gasLimit = bigNumberify(300000);
 
   return callContract(chainId, contract, method, params, opts);
 }
@@ -722,7 +722,7 @@ export async function cancelDecreaseOrder(chainId, library, index, opts) {
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
 
-  opts.gasLimit = bigNumberify(100000);
+  opts.gasLimit = bigNumberify(400000);
 
   return callContract(chainId, contract, method, params, opts);
 }
@@ -733,7 +733,7 @@ export async function cancelIncreaseOrder(chainId, library, index, opts) {
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
 
-  opts.gasLimit = bigNumberify(100000);
+  opts.gasLimit = bigNumberify(400000);
 
   return callContract(chainId, contract, method, params, opts);
 }
