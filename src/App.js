@@ -91,7 +91,7 @@ import Vault from "./abis/Vault.json";
 import PositionRouter from "./abis/PositionRouter.json";
 import ReferralTerms from "./views/ReferralTerms/ReferralTerms";
 import { ModalProvider } from "./components/Modal/ModalProvider";
-
+import { WebSocketProvider } from "./utils/websocket-provider";
 const safeMultisigConnector = new SafeAppConnector();
 
 if ("ethereum" in window) {
@@ -112,7 +112,7 @@ const Zoom = cssTransition({
   duration: 200,
 });
 
-const polygonWsProvider = new ethers.providers.WebSocketProvider(process.env.REACT_APP_POLYGON_WS);
+const polygonWsProvider = new WebSocketProvider(process.env.REACT_APP_POLYGON_WS);
 
 function getWsProvider(active, chainId) {
   if (!active) {
