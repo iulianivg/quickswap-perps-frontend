@@ -15,6 +15,21 @@ import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 
 import useInitWeb3Onboard from "./hooks/useInitWeb3Onboard";
 
+import { useSafeAppConnection, SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react';
+
+import Logo from './assets/logos/QuickswapLogo@2x.png'
+import qlp24Icon from "./img/ic_qlp_24.svg";
+import NotFound from "./404";
+import "shepherd.js/dist/css/shepherd.css";
+import NewBadge from './assets/icons/new.svg'
+import { Web3ReactProvider, useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
+import { ShepherdTourContext } from 'react-shepherd';
+
+import HeaderNav from './HeaderNav'
+
+import { Switch, Route, NavLink, Redirect } from "react-router-dom";
+
 import {
   DEFAULT_SLIPPAGE_AMOUNT,
   SLIPPAGE_BPS_KEY,
@@ -69,6 +84,7 @@ import { ConnectWalletButton } from "./components/Common/Button";
 import useEventToast from "./components/EventToast/useEventToast";
 import EventToastContainer from "./components/EventToast/EventToastContainer";
 import SEO from "./components/Common/SEO";
+import Tour from './components/tour'
 import useRouteQuery from "./hooks/useRouteQuery";
 import { encodeReferralCode } from "./Api/referrals";
 
@@ -131,7 +147,7 @@ function WrongChainButton() {
           </div>
         </div>
 
-      
+
         </>
       )}
     </>
@@ -243,6 +259,7 @@ function AppHeaderUser({
   const { account, active, library, chainId } = useWeb3Onboard();
 
   const [{ wallet }, connect, disconnect] = useConnectWallet();
+  const tour = useContext(ShepherdTourContext);
 
   useEffect(() => {
     if (active) {
@@ -259,6 +276,15 @@ function AppHeaderUser({
       console.log(e);
     }
   };
+  useEffect(() => {
+
+  }, [tour?.getCurrentStep()]);
+
+  const getTour = () => {
+    tour?.start()
+    setWalletModalVisible(true)
+    // tour?.cancel()
+  }
 
   if (!active) {
     return (
@@ -516,7 +542,8 @@ function FullApp() {
   }, [active, chainId, vaultAddress, positionRouterAddress]);
 
   return (
-    <>
+    <Tour>
+
       <div className="App">
         {/* <img style={{ position: "absolute" }} src={backgroundLight} alt="background-light" /> */}
         {/* <div className="App-background-side-1"></div>
@@ -565,7 +592,7 @@ function FullApp() {
                 <AppHeaderLinks />
               </div>
               <div className="App-header-container-right">
-     
+
 
                 <WrongChainButton />
 
@@ -634,20 +661,22 @@ function FullApp() {
               <Redirect to="/trade" />
             </Route>
             <Route exact path="/trade">
-              <ModalProvider>
-                <Exchange
-                  ref={exchangeRef}
-                  savedShowPnlAfterFees={savedShowPnlAfterFees}
-                  savedIsPnlInLeverage={savedIsPnlInLeverage}
-                  setSavedIsPnlInLeverage={setSavedIsPnlInLeverage}
-                  savedSlippageAmount={savedSlippageAmount}
-                  setPendingTxns={setPendingTxns}
-                  pendingTxns={pendingTxns}
-                  savedShouldShowPositionLines={savedShouldShowPositionLines}
-                  setSavedShouldShowPositionLines={setSavedShouldShowPositionLines}
-                  connectWallet={connectWallet}
-                />
-              </ModalProvider>
+              <Tour>
+                <ModalProvider>
+                  <Exchange
+                    ref={exchangeRef}
+                    savedShowPnlAfterFees={savedShowPnlAfterFees}
+                    savedIsPnlInLeverage={savedIsPnlInLeverage}
+                    setSavedIsPnlInLeverage={setSavedIsPnlInLeverage}
+                    savedSlippageAmount={savedSlippageAmount}
+                    setPendingTxns={setPendingTxns}
+                    pendingTxns={pendingTxns}
+                    savedShouldShowPositionLines={savedShouldShowPositionLines}
+                    setSavedShouldShowPositionLines={setSavedShouldShowPositionLines}
+                    connectWallet={connectWallet}
+                  />
+                </ModalProvider>
+              </Tour>
             </Route>
             <Route exact path="/dashboard">
               <Dashboard />
@@ -708,7 +737,6 @@ function FullApp() {
         pauseOnHover
       />
       <EventToastContainer />
-
       <Modal
         className="App-settings"
         isVisible={isSettingsVisible}
@@ -748,7 +776,7 @@ function FullApp() {
           </button>
         </div>
       </Modal>
-    </>
+    </Tour>
   );
 }
 

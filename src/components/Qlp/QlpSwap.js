@@ -636,7 +636,6 @@ export default function QlpSwap(props) {
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner());
     const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemQlpETH" : "unstakeAndRedeemQlp";
-
     const params =
       swapTokenAddress === AddressZero
         ? [qlpAmount, minOut, account]

@@ -864,7 +864,7 @@ export async function updateDecreaseOrder(
   const method = "updateDecreaseOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
-  
+
   opts.gasLimit = bigNumberify(100000);
 
   return callContract(chainId, contract, method, params, opts);
@@ -1057,14 +1057,14 @@ function getTotalVolumeFromGraph() {
   const nowTs = parseInt(Date.now() / 1000);
 
   const query = gql(`{
-      volumeStats( 
-        where: {period: total , timestamp_lte: ${nowTs}}  
-        ) 
-     {  
-       margin    
-       liquidation    
-       swap    
-       mint    
+      volumeStats(
+        where: {period: total , timestamp_lte: ${nowTs}}
+        )
+     {
+       margin
+       liquidation
+       swap
+       mint
        burn
       }
     }`);

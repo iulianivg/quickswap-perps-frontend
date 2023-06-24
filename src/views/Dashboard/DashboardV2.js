@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
 import useSWR from "swr";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import TooltipComponent from "../../components/Tooltip/Tooltip";

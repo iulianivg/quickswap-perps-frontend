@@ -9,13 +9,13 @@ const supportedResolutions = [ "5", "15", "60", "240","1D"]
 
 const config = {
     supported_resolutions: supportedResolutions
-}; 
+};
 
 export default {
 	onReady: cb => {
-	// console.log('=====onReady running')	
+	// console.log('=====onReady running')
 		setTimeout(() => cb(config), 0)
-		
+
 	},
 	searchSymbols: (userInput, exchange, symbolType, onResultReadyCallback) => {
 		// console.log('====Search Symbols running')
@@ -51,7 +51,7 @@ export default {
 			onSymbolResolvedCallback(symbol_stub)
 			// console.log('Resolving that symbol....', symbol_stub)
 		}, 0)
-		
+
 
 	},
 	getBars: function(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {

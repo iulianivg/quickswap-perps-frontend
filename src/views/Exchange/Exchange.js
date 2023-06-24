@@ -658,7 +658,7 @@ export const Exchange = forwardRef((props, ref) => {
       } within the allowed slippage, you can adjust the allowed slippage in the settings on the top right of the page.`;
 
       pushErrorNotification(chainId, message, e);
-      
+
       showModal(<TradeFailed />);
 
       const key = getPositionKey(account, path[path.length - 1], indexToken, isLong);
@@ -692,7 +692,7 @@ export const Exchange = forwardRef((props, ref) => {
       } within the allowed slippage, you can adjust the allowed slippage in the settings on the top right of the page.`;
 
       pushErrorNotification(chainId, message, e);
-      
+
       showModal(<TradeFailed />);
 
       const key = getPositionKey(account, path[path.length - 1], indexToken, isLong);
