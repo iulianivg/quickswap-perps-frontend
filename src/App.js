@@ -6,9 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSafeAppConnection, SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react';
 
 import Logo from './assets/logos/QuickswapLogo@2x.png'
-import qlp24Icon from "./img/ic_qlp_24.svg";
+import LogoMobile from './assets/logos/QuickLogoMobile.png'
 import NotFound from "./404";
-import NewBadge from './assets/icons/new.svg'
 import { Web3ReactProvider, useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 
@@ -140,7 +139,7 @@ function AppHeaderLinks({ small, openSettings, clickCloseIcon }) {
           >
             <img
               style={{ width: 21, height: 21 }}
-              src={qlp24Icon}
+              src={LogoMobile}
               alt="Logo"
             />
           </a>
@@ -637,7 +636,7 @@ function FullApp() {
                     <img
                       width={24}
                       height={24}
-                      src={qlp24Icon}
+                      src={LogoMobile}
                       alt="Trade Logo"
                     />
                   </div>
