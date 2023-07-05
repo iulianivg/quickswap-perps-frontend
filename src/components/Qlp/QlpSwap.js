@@ -274,7 +274,7 @@ export default function QlpSwap(props) {
   const usdcAPR = useMemo(() => {
     if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
       const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
-      return 15000 * 365 * 100 / (7 * qlpSupplyNumber)
+      return 30000 * 365 * 100 / (7 * qlpSupplyNumber)
     }
     return 0
   }, [quickPrice, qlpSupplyUsd]);
