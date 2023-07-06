@@ -1,4 +1,4 @@
-import qperpIcon from './assets/logos/QuickLogoMobile.png'
+import qperpIcon from './img/QuickPerps.svg'
 
 import { init } from '@web3-onboard/react'
 import injectedModule from '@web3-onboard/injected-wallets'
@@ -6,11 +6,10 @@ import walletConnectModule from '@web3-onboard/walletconnect'
 import coinbaseModule from '@web3-onboard/coinbase'
 import trustModule from '@web3-onboard/trust'
 
-// Replace with your DApp's Infura ID
-const INFURA_ID = 'b5d669d7c820440a94488db392c3f19f'
-export const infuraRPC = `https://mainnet.infura.io/v3/${INFURA_ID}`
+const WALLET_CONNECT_PROJECT_ID = "fd151f76a4df984913706025cd64d404";
+const WEB3_ONBOARD_DAPP_ID = "2a56b719-c7ea-4a64-bbf1-98569383edd3"
 
-const dappId = '2a56b719-c7ea-4a64-bbf1-98569383edd3'
+const DEFAULT_CHAIN_ID = 1101;
 
 const injected = injectedModule({
   custom: [
@@ -55,8 +54,8 @@ const walletConnect = walletConnectModule({
   connectFirstChainId: true,
   version: 2,
   handleUri: uri => console.log(uri),
-  projectId: 'fd151f76a4df984913706025cd64d404',
-  requiredChains: [1101],
+  projectId: WALLET_CONNECT_PROJECT_ID,
+  requiredChains: [DEFAULT_CHAIN_ID],
   qrcodeModalOptions: {
     mobileLinks: [
       'rainbow',
@@ -101,8 +100,7 @@ export const initWeb3Onboard = init({
     ],
     agreement: {
       version: '1.0.0',
-      termsUrl: 'https://docs.google.com/document/d/1Gglh43oxUZHdgrS2L9lZfsI4f6HYNF6MbBDsDPJVFkM/edit?pli=1',
-      privacyUrl: 'https://quickswap.exchange/'
+      termsUrl: 'https://docs.google.com/document/d/1Gglh43oxUZHdgrS2L9lZfsI4f6HYNF6MbBDsDPJVFkM/edit?pli=1'
     },
     gettingStartedGuide: 'https://perps-docs.quickswap.exchange/',
     explore: 'https://perps-docs.quickswap.exchange/contracts-and-addresses'
@@ -114,7 +112,7 @@ export const initWeb3Onboard = init({
       minimal: false
     }
   },
-  apiKey: dappId,
+  apiKey: WEB3_ONBOARD_DAPP_ID,
   notify: {
     transactionHandler: transaction => {
       console.log({ transaction })

@@ -77,7 +77,7 @@ import ReferralTerms from "./views/ReferralTerms/ReferralTerms";
 import { ModalProvider } from "./components/Modal/ModalProvider";
 //import { WebSocketProvider } from "./utils/websocket-provider";
 
-import { initWeb3Onboard } from "./services";
+import { initWeb3Onboard } from "./web3OnboardService";
 import { Web3OnboardProvider, useConnectWallet } from "@web3-onboard/react";
 
 import useWeb3Onboard from "./hooks/useWeb3Onboard";
