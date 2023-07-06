@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useWeb3React } from "@web3-react/core";
+
 import useSWR from "swr";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import TooltipComponent from "../../components/Tooltip/Tooltip";
@@ -44,6 +44,7 @@ import AssetDropdown from "./AssetDropdown";
 import SEO from "../../components/Common/SEO";
 
 import { useTotalVolume, useHourlyVolume, useTotalFees } from "../../Api";
+import useWeb3Onboard from "../../hooks/useWeb3Onboard";
 
 const { AddressZero } = ethers.constants;
 
@@ -68,7 +69,7 @@ function getCurrentFeesUsd(tokenAddresses, fees, infoTokens) {
 }
 
 export default function DashboardV2() {
-  const { active, library } = useWeb3React();
+  const { active, library } = useWeb3Onboard();
   const { chainId } = useChainId();
 
   const chainName = getChainName(chainId);
