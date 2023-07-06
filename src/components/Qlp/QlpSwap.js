@@ -266,7 +266,15 @@ export default function QlpSwap(props) {
   const quickAPR = useMemo(() => {
     if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
       const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
-      return quickPrice * 4000000 * 365 / qlpSupplyNumber
+      return quickPrice * 6000000 * 365 / qlpSupplyNumber
+    }
+    return 0
+  }, [quickPrice, qlpSupplyUsd]);
+
+  const usdcAPR = useMemo(() => {
+    if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
+      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
+      return 30000 * 365 * 100 / (7 * qlpSupplyNumber)
     }
     return 0
   }, [quickPrice, qlpSupplyUsd]);
@@ -716,38 +724,84 @@ export default function QlpSwap(props) {
                 </div>
               </div>
             )} */}
-            <div className="App-card-row">
-              <div className="label">APR</div>
-              <div className="value flex">
-                <span className="positive" style={{ marginRight: 6 }}>
-                  {quickAPR.toLocaleString()}%
-                </span>
-                <TooltipWithPortal
-                  handle={<img src={AIRDROPAPR} alt='airdrop APR' width={24} />}
-                  position="right-bottom"
-                  renderContent={() => <>Fee APR: {formatAmount(totalApr, 2, 2, true)}%<br/><br/>Airdrop APR: {quickAPR.toLocaleString()}%</>}
+            <div className="App-airdrop-row">
+              <div>
+                <div className="label">APR</div>
+                <div className="value flex">
+                  <span className="positive" style={{ marginRight: 6 }}>
+                    {(Number(formatAmount(totalApr, 2, 18, true)) + quickAPR + usdcAPR).toLocaleString()}%
+                  </span>
+                  <TooltipWithPortal
+                    handle={<img src={AIRDROPAPR} alt='airdrop APR' width={24} />}
+                    position="right-bottom"
+                    renderContent={
+                      () => <>Eth fee APR: {formatAmount(totalApr, 2, 2, true)}%<br/><br/>Quick airdrop APR: {quickAPR.toLocaleString()}%<br/><br/>USDC airdrop APR: {usdcAPR.toLocaleString()}%</>
+                    }
+                  />
+                  {/* <Tooltip
+                    className="positive"
+                    handle={`${formatAmount(totalApr, 2, 2, true)}%`}
+                    position="right-bottom"
+                    renderContent={() => {
+                      return (
+                        <>
+                          <div className="Tooltip-row">
+                            <span className="label">
+                              {nativeTokenSymbol} ({wrappedTokenSymbol}) APR
+                            </span>
+                            <span>{formatAmount(feeQlpTrackerApr, 2, 2, false)}%</span>
+                          </div>
+                          <div className="Tooltip-row">
+                            <span className="label">Escrowed QPX APR</span>
+                            <span>{formatAmount(stakedQlpTrackerApr, 2, 2, false)}%</span>
+                          </div>
+                        </>
+                      );
+                    }}
+                  /> */}
+                </div>
+              </div>
+              <div className="App-airdrop-text-row">
+                <img
+                  src={
+                    getImageUrl({
+                      path: `coins/others/eth-original`,
+                      format: "png",
+                    })
+                  }
+                  alt='eth'
+                  width={24}
+                  height={24}
                 />
-                {/* <Tooltip
-                  className="positive"
-                  handle={`${formatAmount(totalApr, 2, 2, true)}%`}
-                  position="right-bottom"
-                  renderContent={() => {
-                    return (
-                      <>
-                        <div className="Tooltip-row">
-                          <span className="label">
-                            {nativeTokenSymbol} ({wrappedTokenSymbol}) APR
-                          </span>
-                          <span>{formatAmount(feeQlpTrackerApr, 2, 2, false)}%</span>
-                        </div>
-                        <div className="Tooltip-row">
-                          <span className="label">Escrowed QPX APR</span>
-                          <span>{formatAmount(stakedQlpTrackerApr, 2, 2, false)}%</span>
-                        </div>
-                      </>
-                    );
-                  }}
-                /> */}
+                <p>ETH rewards are updated every Friday and claimable.</p>
+              </div>
+              <div className="App-airdrop-text-row">
+                <img
+                  src={
+                    getImageUrl({
+                      path: `coins/others/quick-original`,
+                      format: "png",
+                    })
+                  }
+                  alt='quick'
+                  width={24}
+                  height={24}
+                />
+                <p>QUICK token airdrop happens every Friday.</p>
+              </div>
+              <div className="App-airdrop-text-row">
+                <img
+                  src={
+                    getImageUrl({
+                      path: `coins/others/usdc-original`,
+                      format: "png",
+                    })
+                  }
+                  alt='usdc'
+                  width={24}
+                  height={24}
+                />
+                <p>USDC token airdrop happens every Friday.</p>
               </div>
             </div>
             <div className="App-card-row">
