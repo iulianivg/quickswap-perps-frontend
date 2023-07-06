@@ -36,6 +36,7 @@ jobs:
           REACT_APP_GAS_API_URL: ${{ secrets.REACT_APP_GAS_API_URL }}
           REACT_APP_PRICE_API_WS_URL: ${{ secrets.REACT_APP_PRICE_API_WS_URL }}
           REACT_APP_CLOUDINARY_CLOUD_NAME: ${{ secrets.REACT_APP_CLOUDINARY_CLOUD_NAME }}
+          REACT_APP_GRAPH_QUICK_API_URL: ${{ secrets.REACT_APP_GRAPH_QUICK_API_URL }}
           GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
           CI: false
 
