@@ -1,4 +1,4 @@
-import qperpIcon from './img/QuickPerps.svg'
+import qperpIcon from './img/quickperp.svg'
 
 import { init } from '@web3-onboard/react'
 import injectedModule from '@web3-onboard/injected-wallets'
@@ -108,7 +108,7 @@ export const initWeb3Onboard = init({
   accountCenter: {
     desktop: {
       position: 'topRight',
-      enabled: true,
+      enabled: false,
       minimal: false
     }
   },

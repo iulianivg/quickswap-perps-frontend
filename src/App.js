@@ -31,6 +31,7 @@ import {
   REFERRAL_CODE_KEY,
   REFERRAL_CODE_QUERY_PARAMS,
   POLYGON_ZKEVM,
+  DEFAULT_CHAIN_ID
 } from "./Helpers";
 
 import Dashboard from "./views/Dashboard/Dashboard";
@@ -112,6 +113,29 @@ function getWsProvider(active, chainId) {
     return polygonWsProvider;
   }
 }
+function WrongChainButton() {
+  const { setChain, wrongChain } = useWeb3Onboard();
+
+  const swithToPolygonZkEVM = () => {
+    setChain({ chainId: DEFAULT_CHAIN_ID });
+  };
+
+  return (
+    <>
+      {wrongChain && (
+        <>
+        <div className="App-header-user-link">
+          <div className="btn btn-red address-btn" onClick={() => swithToPolygonZkEVM()}>
+            Switch to Polygon zkEVM
+          </div>
+        </div>
+
+      
+        </>
+      )}
+    </>
+  );
+}
 
 function AppHeaderLinks({ small, openSettings, clickCloseIcon }) {
   return (
@@ -154,7 +178,7 @@ function AppHeaderLinks({ small, openSettings, clickCloseIcon }) {
         </NavLink>
       </div>
       <div className="App-header-link-container">
-        <a href="https://quickswap.exchange/#/pools" target='_blank' rel="noreferrer">
+        <a href="https://quickswap.exchange/#/pools" target="_blank" rel="noreferrer">
           Pool
         </a>
       </div>
@@ -235,7 +259,6 @@ function AppHeaderUser({
     }
   };
 
-
   if (!active) {
     return (
       <div className="App-header-user">
@@ -302,7 +325,6 @@ function FullApp() {
     clearWalletLinkData();
 
     await disconnect(wallet);
-
   }, [wallet]);
 
   const disconnectAccountAndCloseSettings = () => {
@@ -542,6 +564,10 @@ function FullApp() {
                 <AppHeaderLinks />
               </div>
               <div className="App-header-container-right">
+     
+
+                <WrongChainButton />
+
                 <AppHeaderUser
                   disconnectAccountAndCloseSettings={disconnectAccountAndCloseSettings}
                   openSettings={openSettings}
@@ -681,7 +707,7 @@ function FullApp() {
         pauseOnHover
       />
       <EventToastContainer />
-  
+
       <Modal
         className="App-settings"
         isVisible={isSettingsVisible}
