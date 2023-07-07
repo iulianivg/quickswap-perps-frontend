@@ -264,6 +264,7 @@ function AppHeaderUser({
   useEffect(() => {
     if (active) {
       setWalletModalVisible(false);
+      tour?.show(2)
     }
   }, [active, setWalletModalVisible]);
 
@@ -316,6 +317,7 @@ function FullApp() {
 
   const { account, active, library, chainId } = useWeb3Onboard();
   const [{ wallet }, connect, disconnect] = useConnectWallet();
+  const tour = useContext(ShepherdTourContext);
 
   useEventToast();
 
