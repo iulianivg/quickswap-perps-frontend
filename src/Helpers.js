@@ -76,7 +76,7 @@ export const DEFAULT_MAX_USDQ_AMOUNT = expandDecimals(200 * 1000 * 1000, 18);
 
 export const TAX_BASIS_POINTS = 50;
 export const STABLE_TAX_BASIS_POINTS = 5;
-export const MINT_BURN_FEE_BASIS_POINTS = 0;
+export const MINT_BURN_FEE_BASIS_POINTS = 15;
 export const SWAP_FEE_BASIS_POINTS = 30;
 export const STABLE_SWAP_FEE_BASIS_POINTS = 10;
 export const MARGIN_FEE_BASIS_POINTS = 10;
