@@ -264,7 +264,7 @@ function AppHeaderUser({
   useEffect(() => {
     if (active) {
       setWalletModalVisible(false);
-      tour?.show(2);
+      currentTour.current?.show(2);
     }
   }, [active, setWalletModalVisible]);
 
@@ -778,7 +778,7 @@ function FullApp() {
           </button>
         </div>
       </Modal>
-    </>
+    </Tour>
   );
 }
 
