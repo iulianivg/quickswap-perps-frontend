@@ -1572,7 +1572,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       };
 
       const getRange = (to, from) => {
-        const LIMIT = 10;
+        const LIMIT = 15;
         const _indexes = [];
         from = from || Math.max(to - LIMIT, 0);
         for (let i = to - 1; i >= from; i--) {
