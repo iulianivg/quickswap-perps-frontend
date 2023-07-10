@@ -17,16 +17,16 @@ import useInitWeb3Onboard from "./hooks/useInitWeb3Onboard";
 
 import { useSafeAppConnection, SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react';
 
-import Logo from './assets/logos/QuickswapLogo@2x.png'
+import Logo from "./assets/logos/QuickswapLogo@2x.png";
 import qlp24Icon from "./img/ic_qlp_24.svg";
 import NotFound from "./404";
 import "shepherd.js/dist/css/shepherd.css";
-import NewBadge from './assets/icons/new.svg'
+import NewBadge from "./assets/icons/new.svg";
 import { Web3ReactProvider, useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
-import { ShepherdTourContext } from 'react-shepherd';
+import { ShepherdTourContext } from "react-shepherd";
 
-import HeaderNav from './HeaderNav'
+import HeaderNav from "./HeaderNav";
 
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 
@@ -84,7 +84,7 @@ import { ConnectWalletButton } from "./components/Common/Button";
 import useEventToast from "./components/EventToast/useEventToast";
 import EventToastContainer from "./components/EventToast/EventToastContainer";
 import SEO from "./components/Common/SEO";
-import Tour from './components/tour'
+import Tour from "./components/tour";
 import useRouteQuery from "./hooks/useRouteQuery";
 import { encodeReferralCode } from "./Api/referrals";
 
@@ -264,7 +264,7 @@ function AppHeaderUser({
   useEffect(() => {
     if (active) {
       setWalletModalVisible(false);
-      tour?.show(2)
+      tour?.show(2);
     }
   }, [active, setWalletModalVisible]);
 
@@ -285,7 +285,7 @@ function AppHeaderUser({
     tour?.start()
     setWalletModalVisible(true)
     // tour?.cancel()
-  }
+  };
 
   if (!active) {
     return (
@@ -778,7 +778,7 @@ function FullApp() {
           </button>
         </div>
       </Modal>
-    </Tour>
+    </>
   );
 }
 
