@@ -326,6 +326,20 @@ export function getServerBaseUrl(chainId) {
   return serverBaseUrl;
 }
 
+export function getOrderApiBaseUrl(chainId) {
+  let serverBaseUrl = process.env.REACT_APP_ORDER_API_POLYGON_URL || "";
+  if(serverBaseUrl.at(-1) === '/'){
+    serverBaseUrl = serverBaseUrl.substring(0,serverBaseUrl.length-1)
+  }
+  if (!chainId) {
+    throw new Error("chainId is not provided");
+  }
+  if (chainId === POLYGON_ZKEVM) {
+    return serverBaseUrl;
+  }
+  return serverBaseUrl;
+}
+
 export function getServerUrl(chainId, path) {
   return `${getServerBaseUrl(chainId)}${path}`;
 }
@@ -1538,23 +1552,14 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       const orderBookContract = new ethers.Contract(orderBookAddress, OrderBook.abi, provider);
       const orderBookReaderContract = new ethers.Contract(orderBookReaderAddress, OrderBookReader.abi, provider);
 
-      // const fetchIndexesFromServer = () => {
-      //   const ordersIndexesUrl = `${getServerBaseUrl(chainId)}/orders_indices?account=${account}`;
-      //   return fetch(ordersIndexesUrl)
-      //     .then(async (res) => {
-      //       const json = await res.json();
-      //       const ret = {};
-      //       for (const key of Object.keys(json)) {
-      //         ret[key.toLowerCase()] = json[key].map((val) => parseInt(val.value));
-      //       }
-
-      //       return ret;
-      //     })
-      //     .catch(() => ({ swap: [], increase: [], decrease: [] }));
-      // };
-
       const fetchIndexesFromServer = () => {
-        return { swap: [], increase: [], decrease: [] };
+        const ordersIndexesUrl = `${getOrderApiBaseUrl(chainId)}/orders_indices?account=${account}`;
+        return fetch(ordersIndexesUrl)
+          .then(async (res) => {
+            const json = await res.json();
+            return json;
+          })
+          .catch(() => ({ swap: [], increase: [], decrease: [] }));
       };
 
       const fetchLastIndex = async (type) => {
@@ -1572,7 +1577,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       };
 
       const getRange = (to, from) => {
-        const LIMIT = 15;
+        const LIMIT = 1;
         const _indexes = [];
         from = from || Math.max(to - LIMIT, 0);
         for (let i = to - 1; i >= from; i--) {
