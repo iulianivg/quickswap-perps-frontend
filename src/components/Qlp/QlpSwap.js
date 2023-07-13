@@ -120,7 +120,9 @@ export default function QlpSwap(props) {
   const vaultAddress = getContract(chainId, "Vault");
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN");
   const stakedQlpTrackerAddress = getContract(chainId, "StakedQlpTracker");
+  const oldStakedQlpTrackerAddress = getContract(chainId, "OldStakedQlpTracker");
   const feeQlpTrackerAddress = getContract(chainId, "FeeQlpTracker");
+  const oldFeeQlpTrackerAddress = getContract(chainId, "OldFeeQlpTracker");
   const usdqAddress = getContract(chainId, "USDQ");
   const qlpAddress = getContract(chainId, "QLP");
   const qlpManagerAddress = getContract(chainId, "QlpManager");
@@ -181,24 +183,17 @@ export default function QlpSwap(props) {
     }
   );
   const { data: oldQlpBalance } = useSWR(
-    [`QlpSwap:oldQlpBalance:${active}`, chainId, stakedQlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT],
+    [`QlpSwap:oldQlpBalance:${active}`, chainId, oldStakedQlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT],
     {
       fetcher: fetcher(library, RewardTracker),
     }
   );
-
-
-
-
-  const rewardTrackersForStakingInfo = [stakedQlpTrackerAddress, feeQlpTrackerAddress];
-  const { data: stakingInfo } = useSWR(
-    [`QlpSwap:stakingInfo:${active}`, chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT],
+  const { data: oldQlpRewards } = useSWR(
+    [`QlpSwap:oldQlpRewards:${active}`, chainId, oldFeeQlpTrackerAddress, "claimable", account || PLACEHOLDER_ACCOUNT],
     {
-      fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
+      fetcher: fetcher(library, RewardTracker),
     }
   );
-
-  const stakingData = getStakingData(stakingInfo);
 
   const redemptionTime = lastPurchaseTime ? lastPurchaseTime.add(QLP_COOLDOWN_DURATION) : undefined;
   const inCooldownWindow = redemptionTime && parseInt(Date.now() / 1000) < redemptionTime;
@@ -220,6 +215,10 @@ export default function QlpSwap(props) {
   }
   if (oldQlpBalance) {
     oldQlpBalanceUsd = oldQlpBalance.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
+  }
+  let oldQlpRewardsUsd;
+  if (oldQlpRewards) {
+    oldQlpRewardsUsd = oldQlpRewards.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
   }
   const qlpSupplyUsd = qlpSupply.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
 
@@ -380,7 +379,7 @@ export default function QlpSwap(props) {
         const rewardInUsd = quickPrice.mul(reward).div(expandDecimals(1, 18))
         totalRewardsInUsd.current = totalRewardsInUsd.current.add(rewardInUsd);
         totalApr.current = totalRewardsInUsd.current.mul
-        result.push({ token: { address: claimableTokens[i], symbol: "QUICK" }, reward, rewardInUsd });
+        result.push({ token: { address: claimableTokens[i], symbol: "QUICK", displayDecimals: 4 }, reward, rewardInUsd });
       } else {
         const token = infoTokens[claimableTokens[i]];
         if (token) {
@@ -800,15 +799,26 @@ export default function QlpSwap(props) {
               </div>
             </div>
             {oldQlpBalance && oldQlpBalance.gt(0) &&
-              (<div className="App-card-row">
-                <div className="label">Old Wallet
-                </div>
-                <div className="value">
-                  {formatAmount(oldQlpBalance, QLP_DECIMALS, 4, true)} QLP ($
-                  {formatAmount(oldQlpBalanceUsd, USD_DECIMALS, 2, true)})
-                  <button onClick={migrateStaking} style={{ background: "#448AFF", marginLeft: "10px", width: "140px", height: "50px", padding: "0" }} className="Stake-card-option">Migrate Staking</button>
-                </div>
-              </div>
+              (
+                <>
+                  <div className="App-card-row">
+                    <div className="label">Old Wallet
+                    </div>
+                    <div className="value">
+                      {formatAmount(oldQlpBalance, QLP_DECIMALS, 4, true)} QLP ($
+                      {formatAmount(oldQlpBalanceUsd, USD_DECIMALS, 2, true)})
+                      <button onClick={migrateStaking} style={{ background: "#448AFF", marginLeft: "10px", width: "140px", height: "50px", padding: "0" }} className="Stake-card-option">Migrate Staking</button>
+                    </div>
+                  </div>
+                  <div className="App-card-row">
+                    <div className="label">Old Wallet Rewards
+                    </div>
+                    <div className="value">
+                      {formatAmount(oldQlpRewards, QLP_DECIMALS, 4, true)} QLP ($
+                      {formatAmount(oldQlpRewardsUsd, USD_DECIMALS, 2, true)})
+                    </div>
+                  </div>
+                </>
               )}
           </div>
           <div className="App-card-divider"></div>

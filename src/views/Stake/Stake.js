@@ -474,10 +474,10 @@ export default function Stake({ setPendingTxns, connectWallet, rewardTokens }) {
                     <>
                         <div className="Stake-card-title">
                             <div className="Stake-card-title-mark-label">
-                                {formatAmount(rewardToken.reward, rewardToken.token.decimals, 4, true)}{'\u00A0'}
+                                {formatAmount(rewardToken.reward, rewardToken.token.decimals, rewardToken.token.displayDecimals, true)}{'\u00A0'}
                                 {rewardToken.token.symbol}{'\u00A0'}
                                 ($
-                                {formatAmount(rewardToken.rewardInUsd, USD_DECIMALS, 4, true)})
+                                {formatAmount(rewardToken.rewardInUsd, USD_DECIMALS, 2, true)})
                             </div>
                         </div>
                         <div className="Stake-card-action">
