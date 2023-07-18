@@ -181,9 +181,6 @@ export default function QlpSwap(props) {
     }
   );
 
-
-
-
   const rewardTrackersForStakingInfo = [stakedQlpTrackerAddress, feeQlpTrackerAddress];
   const { data: stakingInfo } = useSWR(
     [`QlpSwap:stakingInfo:${active}`, chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT],
@@ -233,8 +230,7 @@ export default function QlpSwap(props) {
     isBuying && swapTokenAddress !== AddressZero && tokenAllowance && swapAmount && swapAmount.gt(tokenAllowance);
 
   const swapUsdMin = getUsd(swapAmount, swapTokenAddress, false, infoTokens);
-  const qlpUsdMax =
-    qlpAmount && qlpPrice ? qlpAmount.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS)) : undefined;
+  const qlpUsdMax = qlpAmount && qlpPrice ? qlpAmount.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS)) : undefined;
 
   let isSwapTokenCapReached;
   if (swapTokenInfo.managedUsd && swapTokenInfo.maxUsdqAmount) {
@@ -261,22 +257,24 @@ export default function QlpSwap(props) {
   const nativeToken = getTokenInfo(infoTokens, AddressZero);
 
   const quickInfo = useQuickInfo(POLYGON_ZKEVM);
-  const quickPrice = quickInfo ? Number(quickInfo.derivedMatic) * Number(formatAmount(nativeToken.minPrice, USD_DECIMALS, 6)) : 0;
+  const quickPrice = quickInfo
+    ? Number(quickInfo.derivedMatic) * Number(formatAmount(nativeToken.minPrice, USD_DECIMALS, 6))
+    : 0;
 
   const quickAPR = useMemo(() => {
     if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
-      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
-      return quickPrice * 6000000 * 365 / qlpSupplyNumber
+      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false));
+      return (quickPrice * 6000000 * 365) / qlpSupplyNumber;
     }
-    return 0
+    return 0;
   }, [quickPrice, qlpSupplyUsd]);
 
   const usdcAPR = useMemo(() => {
     if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
-      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false))
-      return 30000 * 365 * 100 / (7 * qlpSupplyNumber)
+      const qlpSupplyNumber = Number(formatAmount(qlpSupplyUsd, USD_DECIMALS, 2, false));
+      return (25000 * 365 * 100) / (7 * qlpSupplyNumber);
     }
-    return 0
+    return 0;
   }, [quickPrice, qlpSupplyUsd]);
 
   let totalApr = bigNumberify(0);
@@ -581,9 +579,7 @@ export default function QlpSwap(props) {
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner());
     const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemQlpETH" : "unstakeAndRedeemQlp";
     const params =
-      swapTokenAddress === AddressZero
-        ? [qlpAmount, minOut, account]
-        : [swapTokenAddress, qlpAmount, minOut, account];
+      swapTokenAddress === AddressZero ? [qlpAmount, minOut, account] : [swapTokenAddress, qlpAmount, minOut, account];
 
     callContract(chainId, contract, method, params, {
       gasLimit: bigNumberify(1100000),
@@ -732,11 +728,17 @@ export default function QlpSwap(props) {
                     {(Number(formatAmount(totalApr, 2, 18, true)) + quickAPR + usdcAPR).toLocaleString()}%
                   </span>
                   <TooltipWithPortal
-                    handle={<img src={AIRDROPAPR} alt='airdrop APR' width={24} />}
+                    handle={<img src={AIRDROPAPR} alt="airdrop APR" width={24} />}
                     position="right-bottom"
-                    renderContent={
-                      () => <>Eth fee APR: {formatAmount(totalApr, 2, 2, true)}%<br/><br/>Quick airdrop APR: {quickAPR.toLocaleString()}%<br/><br/>USDC airdrop APR: {usdcAPR.toLocaleString()}%</>
-                    }
+                    renderContent={() => (
+                      <>
+                        Eth fee APR: {formatAmount(totalApr, 2, 2, true)}%<br />
+                        <br />
+                        Quick airdrop APR: {quickAPR.toLocaleString()}%<br />
+                        <br />
+                        USDC airdrop APR: {usdcAPR.toLocaleString()}%
+                      </>
+                    )}
                   />
                   {/* <Tooltip
                     className="positive"
@@ -763,13 +765,11 @@ export default function QlpSwap(props) {
               </div>
               <div className="App-airdrop-text-row">
                 <img
-                  src={
-                    getImageUrl({
-                      path: `coins/others/eth-original`,
-                      format: "png",
-                    })
-                  }
-                  alt='eth'
+                  src={getImageUrl({
+                    path: `coins/others/eth-original`,
+                    format: "png",
+                  })}
+                  alt="eth"
                   width={24}
                   height={24}
                 />
@@ -777,13 +777,11 @@ export default function QlpSwap(props) {
               </div>
               <div className="App-airdrop-text-row">
                 <img
-                  src={
-                    getImageUrl({
-                      path: `coins/others/quick-original`,
-                      format: "png",
-                    })
-                  }
-                  alt='quick'
+                  src={getImageUrl({
+                    path: `coins/others/quick-original`,
+                    format: "png",
+                  })}
+                  alt="quick"
                   width={24}
                   height={24}
                 />
@@ -791,13 +789,11 @@ export default function QlpSwap(props) {
               </div>
               <div className="App-airdrop-text-row">
                 <img
-                  src={
-                    getImageUrl({
-                      path: `coins/others/usdc-original`,
-                      format: "png",
-                    })
-                  }
-                  alt='usdc'
+                  src={getImageUrl({
+                    path: `coins/others/usdc-original`,
+                    format: "png",
+                  })}
+                  alt="usdc"
                   width={24}
                   height={24}
                 />
@@ -861,7 +857,8 @@ export default function QlpSwap(props) {
               defaultTokenName={"QLP"}
             >
               <div className="selected-token">
-                <img width={24} height={24} src={qlp24Icon} alt="qlp24Icon" />QLP
+                <img width={24} height={24} src={qlp24Icon} alt="qlp24Icon" />
+                QLP
               </div>
             </BuyInputSection>
           )}
@@ -964,18 +961,18 @@ export default function QlpSwap(props) {
           </div>
         </div>
       </div>
-      <Stake/>
+      <Stake />
       <div className="Tab-title-section" style={{ marginLeft: -12 }}>
         <div className="Page-title">Save Fees</div>
         {isBuying && (
           <div className="Page-description">
-            The fees can  vary based on the asset you wish to add liquidity for QLP.
+            The fees can vary based on the asset you wish to add liquidity for QLP.
             <br /> Enter the requested amount of QLP or asset to be added into the interface and compare the fees here.
           </div>
         )}
         {!isBuying && (
           <div className="Page-description">
-            The fees can  vary based on the asset you wish to add liquidity for QLP.
+            The fees can vary based on the asset you wish to add liquidity for QLP.
             <br /> Enter the requested amount of QLP or asset to be added into the interface and compare the fees here.
           </div>
         )}
@@ -1074,7 +1071,7 @@ export default function QlpSwap(props) {
               try {
                 tokenImage = getImageUrl({
                   path: `coins/others/${token.symbol.toLowerCase()}-original`,
-                  format:"png"
+                  format: "png",
                 });
               } catch (error) {
                 console.error(error);
@@ -1090,8 +1087,8 @@ export default function QlpSwap(props) {
               function renderFees() {
                 const swapUrl =
                   chainId === POLYGON_ZKEVM
-                        ? `https://quickswap.exchange/#/swap?currency0=${token.address}`
-                        : `https://quickswap.exchange/#/swap?currency0=${token.address}`;
+                    ? `https://quickswap.exchange/#/swap?currency0=${token.address}`
+                    : `https://quickswap.exchange/#/swap?currency0=${token.address}`;
                 switch (true) {
                   case (isBuying && isCapReached) || (!isBuying && managedUsd?.lt(1)):
                     return (
@@ -1107,7 +1104,7 @@ export default function QlpSwap(props) {
                             <br />
                             <p>
                               <a href={swapUrl} target="_blank" rel="noreferrer">
-                                        Swap on {chainId === POLYGON_ZKEVM ? "Quickswap" : "Trader Joe"}
+                                Swap on {chainId === POLYGON_ZKEVM ? "Quickswap" : "Trader Joe"}
                               </a>
                             </p>
                           </div>
@@ -1164,7 +1161,6 @@ export default function QlpSwap(props) {
                         >
                           {token.name}
                         </div>
-
                       </div>
                     </div>
                   </td>
@@ -1272,7 +1268,7 @@ export default function QlpSwap(props) {
             try {
               tokenImage = getImageUrl({
                 path: `coins/others/${token.symbol.toLowerCase()}-original`,
-                format:"png"
+                format: "png",
               });
             } catch (error) {
               console.error(error);
