@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useHistory } from "react-router-dom";
-
-import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { ethers } from "ethers";
 
@@ -65,6 +63,7 @@ import "./QlpSwap.css";
 import AssetDropdown from "../../views/Dashboard/AssetDropdown";
 import { getImageUrl } from "../../cloudinary/getImageUrl";
 import Stake from "../../views/Stake/Stake";
+import useWeb3Onboard from "../../hooks/useWeb3Onboard";
 
 const { AddressZero } = ethers.constants;
 
@@ -96,7 +95,7 @@ export default function QlpSwap(props) {
   const history = useHistory();
   const swapLabel = isBuying ? "Add Liquidity" : "Withdraw Liquidity";
   const tabLabel = isBuying ? "Add Liquidity" : "Withdraw Liquidity";
-  const { active, library, account } = useWeb3React();
+  const { active, library, account } = useWeb3Onboard();
   const { chainId } = useChainId();
   // const chainName = getChainName(chainId)
   const tokens = getTokens(chainId);
@@ -339,7 +338,10 @@ export default function QlpSwap(props) {
     }
   );
 
+
   const [allTokensPerInterval,] = useAllTokensPerInterval(library, chainId)
+  console.log("🚀 allTokensPerInterval:", allTokensPerInterval)
+
 
   const apr = useMemo(() => {
     let annualRewardsInUsd = bigNumberify(0);

@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { InjectedConnector } from "@web3-react/injected-connector";
-import {
-  WalletConnectConnector,
-  UserRejectedRequestError as UserRejectedRequestErrorWalletConnect,
-} from "@web3-react/walletconnect-connector";
+
 import { toast } from "react-toastify";
-import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
+
 import { useLocalStorage } from "react-use";
 import { ethers } from "ethers";
 import { format as formatDateFn } from "date-fns";
@@ -18,6 +14,7 @@ import OrderBookReader from "./abis/OrderBookReader.json";
 import OrderBook from "./abis/OrderBook.json";
 
 import { getWhitelistedTokens, isValidToken } from "./data/Tokens";
+import useWeb3Onboard from "./hooks/useWeb3Onboard";
 
 const { AddressZero } = ethers.constants;
 
@@ -79,7 +76,7 @@ export const DEFAULT_MAX_USDQ_AMOUNT = expandDecimals(200 * 1000 * 1000, 18);
 
 export const TAX_BASIS_POINTS = 50;
 export const STABLE_TAX_BASIS_POINTS = 5;
-export const MINT_BURN_FEE_BASIS_POINTS = 0;
+export const MINT_BURN_FEE_BASIS_POINTS = 15;
 export const SWAP_FEE_BASIS_POINTS = 30;
 export const STABLE_SWAP_FEE_BASIS_POINTS = 10;
 export const MARGIN_FEE_BASIS_POINTS = 10;
@@ -184,20 +181,6 @@ export const platformTokens = {
 };
 
 const supportedChainIds = [POLYGON_ZKEVM];
-const injectedConnector = new InjectedConnector({
-  supportedChainIds,
-});
-
-const getWalletConnectConnector = () => {
-  const chainId = localStorage.getItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY) || DEFAULT_CHAIN_ID;
-  return new WalletConnectConnector({
-    rpc: {
-      [POLYGON_ZKEVM]: POLYGON_RPC_PROVIDERS[0],
-    },
-    qrcode: true,
-    chainId,
-  });
-};
 
 export function isSupportedChain(chainId) {
   return supportedChainIds.includes(chainId);
@@ -336,6 +319,20 @@ export function getServerBaseUrl(chainId) {
     if (fromLocalStorage) {
       return fromLocalStorage;
     }
+  }
+  if (chainId === POLYGON_ZKEVM) {
+    return serverBaseUrl;
+  }
+  return serverBaseUrl;
+}
+
+export function getOrderApiBaseUrl(chainId) {
+  let serverBaseUrl = process.env.REACT_APP_ORDER_API_POLYGON_URL || "";
+  if(serverBaseUrl.at(-1) === '/'){
+    serverBaseUrl = serverBaseUrl.substring(0,serverBaseUrl.length-1)
+  }
+  if (!chainId) {
+    throw new Error("chainId is not provided");
   }
   if (chainId === POLYGON_ZKEVM) {
     return serverBaseUrl;
@@ -1207,12 +1204,8 @@ export function activateInjectedProvider(providerName) {
   }
 }
 
-export function getInjectedConnector() {
-  return injectedConnector;
-}
-
 export function useChainId() {
-  let { chainId } = useWeb3React();
+  let { chainId } = useWeb3Onboard();
 
   if (!chainId) {
     const chainIdFromLocalStorage = localStorage.getItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY);
@@ -1266,115 +1259,6 @@ export function clearWalletLinkData() {
     .map((x) => localStorage.removeItem(x));
 }
 
-export function useEagerConnect(setActivatingConnector) {
-  const { activate, active } = useWeb3React();
-  const [tried, setTried] = useState(false);
-
-  useEffect(() => {
-    (async function () {
-      if (Boolean(localStorage.getItem(SHOULD_EAGER_CONNECT_LOCALSTORAGE_KEY)) !== true) {
-        // only works with WalletConnect
-        clearWalletConnectData();
-        // force clear localStorage connection for MM/CB Wallet (Brave legacy)
-        clearWalletLinkData();
-        return;
-      }
-
-      let shouldTryWalletConnect = false;
-      try {
-        // naive validation to not trigger Wallet Connect if data is corrupted
-        const rawData = localStorage.getItem(WALLET_CONNECT_LOCALSTORAGE_KEY);
-        if (rawData) {
-          const data = JSON.parse(rawData);
-          if (data && data.connected) {
-            shouldTryWalletConnect = true;
-          }
-        }
-      } catch (ex) {
-        if (ex instanceof SyntaxError) {
-          // rawData is not a valid json
-          clearWalletConnectData();
-        }
-      }
-
-      if (shouldTryWalletConnect) {
-        try {
-          const connector = getWalletConnectConnector();
-          setActivatingConnector(connector);
-          await activate(connector, undefined, true);
-          // in case Wallet Connect is activated no need to check injected wallet
-          return;
-        } catch (ex) {
-          // assume data in localstorage is corrupted and delete it to not retry on next page load
-          clearWalletConnectData();
-        }
-      }
-
-      try {
-        const connector = getInjectedConnector();
-        const currentProviderName = localStorage.getItem(CURRENT_PROVIDER_LOCALSTORAGE_KEY) ?? false;
-        if (currentProviderName !== false) {
-          activateInjectedProvider(currentProviderName);
-        }
-        const authorized = await connector.isAuthorized();
-        if (authorized) {
-          setActivatingConnector(connector);
-          await activate(connector, undefined, true);
-        }
-      } catch (ex) {}
-
-      setTried(true);
-    })();
-  }, []); // intentionally only running on mount (make sure it's only mounted once :))
-
-  // if the connection worked, wait until we get confirmation of that to flip the flag
-  useEffect(() => {
-    if (!tried && active) {
-      setTried(true);
-    }
-  }, [tried, active]);
-
-  return tried;
-}
-
-export function useInactiveListener(suppress = false) {
-  const injected = getInjectedConnector();
-  const { active, error, activate } = useWeb3React();
-
-  useEffect(() => {
-    const { ethereum } = window;
-    if (ethereum && ethereum.on && !active && !error && !suppress) {
-      const handleConnect = () => {
-        activate(injected);
-      };
-      const handleChainChanged = (chainId) => {
-        activate(injected);
-      };
-      const handleAccountsChanged = (accounts) => {
-        if (accounts.length > 0) {
-          activate(injected);
-        }
-      };
-      const handleNetworkChanged = (networkId) => {
-        activate(injected);
-      };
-
-      ethereum.on("connect", handleConnect);
-      ethereum.on("chainChanged", handleChainChanged);
-      ethereum.on("accountsChanged", handleAccountsChanged);
-      ethereum.on("networkChanged", handleNetworkChanged);
-
-      return () => {
-        if (ethereum.removeListener) {
-          ethereum.removeListener("connect", handleConnect);
-          ethereum.removeListener("chainChanged", handleChainChanged);
-          ethereum.removeListener("accountsChanged", handleAccountsChanged);
-          ethereum.removeListener("networkChanged", handleNetworkChanged);
-        }
-      };
-    }
-  }, [active, error, suppress, activate]);
-}
 
 export function getProvider(library, chainId) {
   let provider;
@@ -1647,7 +1531,7 @@ export function getOrderKey(order) {
 }
 
 export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
-  const { library, account: connectedAccount } = useWeb3React();
+  const { library, account: connectedAccount } = useWeb3Onboard();
   const active = true; // this is used in Actions.js so set active to always be true
   const account = overrideAccount || connectedAccount;
 
@@ -1668,23 +1552,14 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       const orderBookContract = new ethers.Contract(orderBookAddress, OrderBook.abi, provider);
       const orderBookReaderContract = new ethers.Contract(orderBookReaderAddress, OrderBookReader.abi, provider);
 
-      // const fetchIndexesFromServer = () => {
-      //   const ordersIndexesUrl = `${getServerBaseUrl(chainId)}/orders_indices?account=${account}`;
-      //   return fetch(ordersIndexesUrl)
-      //     .then(async (res) => {
-      //       const json = await res.json();
-      //       const ret = {};
-      //       for (const key of Object.keys(json)) {
-      //         ret[key.toLowerCase()] = json[key].map((val) => parseInt(val.value));
-      //       }
-
-      //       return ret;
-      //     })
-      //     .catch(() => ({ swap: [], increase: [], decrease: [] }));
-      // };
-
       const fetchIndexesFromServer = () => {
-        return { swap: [], increase: [], decrease: [] };
+        const ordersIndexesUrl = `${getOrderApiBaseUrl(chainId)}/orders_indices?account=${account}`;
+        return fetch(ordersIndexesUrl)
+          .then(async (res) => {
+            const json = await res.json();
+            return json;
+          })
+          .catch(() => ({ swap: [], increase: [], decrease: [] }));
       };
 
       const fetchLastIndex = async (type) => {
@@ -2063,52 +1938,6 @@ export const switchNetwork = async (chainId, active) => {
 
     console.error("error", ex);
   }
-};
-
-export const getWalletConnectHandler = (activate, deactivate, setActivatingConnector) => {
-  const fn = async () => {
-    const walletConnect = getWalletConnectConnector();
-    setActivatingConnector(walletConnect);
-    activate(walletConnect, (ex) => {
-      if (ex instanceof UnsupportedChainIdError) {
-        helperToast.error("Unsupported chain. Switch to Polygon network on your wallet and try again");
-        console.warn(ex);
-      } else if (!(ex instanceof UserRejectedRequestErrorWalletConnect)) {
-        helperToast.error(ex.message);
-        console.warn(ex);
-      }
-      clearWalletConnectData();
-      deactivate();
-    });
-  };
-  return fn;
-};
-
-export const getInjectedHandler = (activate) => {
-  const fn = async () => {
-    activate(getInjectedConnector(), (e) => {
-      const chainId = localStorage.getItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY) || DEFAULT_CHAIN_ID;
-
-      if (e instanceof UnsupportedChainIdError) {
-        helperToast.error(
-          <div>
-            <div>Your wallet is not connected to {getChainName(chainId)}.</div>
-            <br />
-            <div className="clickable underline margin-bottom" onClick={() => switchNetwork(chainId, true)}>
-              Switch to {getChainName(chainId)}
-            </div>
-            <div className="clickable underline" onClick={() => switchNetwork(chainId, true)}>
-              Add {getChainName(chainId)}
-            </div>
-          </div>
-        );
-        return;
-      }
-      const errString = e.message ?? e.toString();
-      helperToast.error(errString);
-    });
-  };
-  return fn;
 };
 
 export function isMobileDevice(navigator) {

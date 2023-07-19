@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useWeb3React } from "@web3-react/core";
 import Modal from "../../components/Modal/Modal";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import Vault from "../../abis/Vault.json";
@@ -32,6 +31,7 @@ import { getContract } from "../../Addresses";
 import "./Stake.css";
 import TooltipWithPortal from "../../components/Tooltip/TooltipWithPortal";
 import Tooltip from "../../components/Tooltip/Tooltip";
+import useWeb3Onboard from "../../hooks/useWeb3Onboard";
 
 
 function ClaimAllModal(props) {
@@ -204,7 +204,7 @@ function ClaimModal(props) {
 }
 
 export default function Stake({ setPendingTxns, connectWallet, rewardTokens }) {
-    const { active, library, account } = useWeb3React();
+    const { active, library, account } = useWeb3Onboard();
     const { chainId } = useChainId();
 
     const [isClaimAllModalVisible, setIsClaimAllModalVisible] = useState(false);
