@@ -64,6 +64,7 @@ import AssetDropdown from "../../views/Dashboard/AssetDropdown";
 import { getImageUrl } from "../../cloudinary/getImageUrl";
 import Stake from "../../views/Stake/Stake";
 import AIRDROPAPR from "../../assets/icons/airdropAPR.jpg";
+import QUICKIcon from "../../assets/logos/logo.png";
 import TooltipWithPortal from "../Tooltip/TooltipWithPortal";
 import useWeb3Onboard from "../../hooks/useWeb3Onboard";
 
@@ -776,15 +777,7 @@ export default function QlpSwap(props) {
                 <p>ETH rewards are updated every Friday and claimable.</p>
               </div>
               <div className="App-airdrop-text-row">
-                <img
-                  src={getImageUrl({
-                    path: `coins/others/quick-original`,
-                    format: "png",
-                  })}
-                  alt="quick"
-                  width={24}
-                  height={24}
-                />
+                <img src={QUICKIcon} alt="quick" width={24} height={24} />
                 <p>QUICK token airdrop happens every Friday.</p>
               </div>
               <div className="App-airdrop-text-row">
