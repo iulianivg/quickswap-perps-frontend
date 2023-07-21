@@ -638,7 +638,7 @@ export default function QlpSwap(props) {
     console.log("🚀 ~ file: QlpSwap.js:578 ~ sellQlp ~ params:", params)
 
     callContract(chainId, contract, method, params, {
-      gasLimit: bigNumberify(1100000),
+      gasLimit: bigNumberify(1500000),
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
       successMsg: `${formatAmount(qlpAmount, 18, 4, true)} QLP sold for ${formatAmount(
