@@ -120,13 +120,13 @@ export default function DashboardV2() {
   const tokensForSupplyQuery = [qlpAddress, usdqAddress];
 
   const { data: aums } = useSWR([`Dashboard:getAums:${active}`, chainId, qlpManagerAddress, "getAums"], {
-      dedupingInterval: 20000,
-      fetcher: fetcher(library, QlpManager),
+    dedupingInterval: 20000,
+    fetcher: fetcher(library, QlpManager),
   });
 
   const { data: fees } = useSWR([`Dashboard:fees:${active}`, chainId, readerAddress, "getFees", vaultAddress], {
-      dedupingInterval: 30000,
-      fetcher: fetcher(library, Reader, [whitelistedTokenAddresses]),
+    dedupingInterval: 30000,
+    fetcher: fetcher(library, Reader, [whitelistedTokenAddresses]),
   });
 
   const { data: totalSupplies } = useSWR(
@@ -168,7 +168,6 @@ export default function DashboardV2() {
   let qlpSupply;
   let qlpMarketCap;
   if (aum && totalSupplies && totalSupplies[1]) {
-    
     qlpSupply = totalSupplies[1];
     qlpPrice =
       aum && aum.gt(0) && qlpSupply.gt(0)
@@ -338,8 +337,7 @@ export default function DashboardV2() {
           <div className="section-title-content">
             <div className="Page-title">Dashboard</div>
             <div className="Page-description">
-              {chainName} started on {totalStatsStartDate}.
-              {/* <br /> In-depth statistics:{" "} */}
+              QuickPerps was launched on {chainName} on {totalStatsStartDate}.{/* <br /> In-depth statistics:{" "} */}
               {/* {chainId === POLYGON_ZKEVM && (
                 <a
                   href="https://perps-analytics.quickswap.exchange"
@@ -463,7 +461,7 @@ export default function DashboardV2() {
                     <div className="App-card-title-mark-icon">
                       <img style={{ width: 48, height: 48 }} src={qlp40Icon} alt="qlp40Icon" />
                     </div>
-                    <div className="App-card-title-mark-info" style={{marginRight:"auto"}}>
+                    <div className="App-card-title-mark-info" style={{ marginRight: "auto" }}>
                       <div className="App-card-title-mark-title">QLP</div>
                     </div>
                     <div>

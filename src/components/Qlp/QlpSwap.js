@@ -338,7 +338,6 @@ export default function QlpSwap(props) {
     }
   );
 
-
   const [allTokensPerInterval,] = useAllTokensPerInterval(library, chainId)
   console.log("🚀 allTokensPerInterval:", allTokensPerInterval)
 
