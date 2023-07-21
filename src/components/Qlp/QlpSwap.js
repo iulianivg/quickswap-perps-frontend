@@ -67,29 +67,6 @@ import useWeb3Onboard from "../../hooks/useWeb3Onboard";
 
 const { AddressZero } = ethers.constants;
 
-function getStakingData(stakingInfo) {
-  if (!stakingInfo || stakingInfo.length === 0) {
-    return;
-  }
-
-  const keys = ["stakedQlpTracker", "feeQlpTracker"];
-  const data = {};
-  const propsLength = 5;
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    data[key] = {
-      claimable: stakingInfo[i * propsLength],
-      tokensPerInterval: stakingInfo[i * propsLength + 1],
-      averageStakedAmounts: stakingInfo[i * propsLength + 2],
-      cumulativeRewards: stakingInfo[i * propsLength + 3],
-      totalSupply: stakingInfo[i * propsLength + 4],
-    };
-  }
-
-  return data;
-}
-
 export default function QlpSwap(props) {
   const { savedSlippageAmount, isBuying, setPendingTxns, connectWallet, setIsBuying } = props;
   const history = useHistory();
@@ -129,12 +106,16 @@ export default function QlpSwap(props) {
   const tokensForBalanceAndSupplyQuery = [qlpAddress, usdqAddress];
 
   const tokenAddresses = tokens.map((token) => token.address);
+
+
   const { data: tokenBalances } = useSWR(
     [`QlpSwap:getTokenBalances:${active}`, chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT],
     {
       fetcher: fetcher(library, Reader, [tokenAddresses]),
     }
   );
+  const { infoTokens } = useInfoTokens(library, chainId, active, tokenBalances, undefined);
+  const nativeToken = getTokenInfo(infoTokens, AddressZero);
 
   const { data: balancesAndSupplies } = useSWR(
     [
@@ -187,13 +168,14 @@ export default function QlpSwap(props) {
       fetcher: fetcher(library, RewardTracker),
     }
   );
+
   const { data: oldQlpRewards } = useSWR(
     [`QlpSwap:oldQlpRewards:${active}`, chainId, oldFeeQlpTrackerAddress, "claimable", account || PLACEHOLDER_ACCOUNT],
     {
       fetcher: fetcher(library, RewardTracker),
     }
   );
-
+  
   const redemptionTime = lastPurchaseTime ? lastPurchaseTime.add(QLP_COOLDOWN_DURATION) : undefined;
   const inCooldownWindow = redemptionTime && parseInt(Date.now() / 1000) < redemptionTime;
 
@@ -216,8 +198,8 @@ export default function QlpSwap(props) {
     oldQlpBalanceUsd = oldQlpBalance.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
   }
   let oldQlpRewardsUsd;
-  if (oldQlpRewards) {
-    oldQlpRewardsUsd = oldQlpRewards.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
+  if (oldQlpRewards && nativeToken && nativeToken.minPrice) {
+    oldQlpRewardsUsd = oldQlpRewards.mul(nativeToken.minPrice).div(expandDecimals(1, USDQ_DECIMALS));
   }
   const qlpSupplyUsd = qlpSupply.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
 
@@ -228,7 +210,6 @@ export default function QlpSwap(props) {
     reserveAmountUsd = reservedAmount.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS));
   }
 
-  const { infoTokens } = useInfoTokens(library, chainId, active, tokenBalances, undefined);
   const swapToken = getToken(chainId, swapTokenAddress);
   const swapTokenInfo = getTokenInfo(infoTokens, swapTokenAddress);
 
@@ -265,8 +246,6 @@ export default function QlpSwap(props) {
     setSwapTokenAddress(token.address);
     setIsWaitingForApproval(false);
   };
-
-  const nativeToken = getTokenInfo(infoTokens, AddressZero);
 
   const quickInfo = useQuickInfo(POLYGON_ZKEVM);
   // let quickPrice = quickInfo ? Number(quickInfo.derivedMatic) * Number(formatAmount(nativeToken.minPrice, USD_DECIMALS, 6)) : 0;
@@ -339,7 +318,6 @@ export default function QlpSwap(props) {
   );
 
   const [allTokensPerInterval,] = useAllTokensPerInterval(library, chainId)
-  console.log("🚀 allTokensPerInterval:", allTokensPerInterval)
 
 
   const apr = useMemo(() => {
@@ -363,6 +341,7 @@ export default function QlpSwap(props) {
       const tokenAnnualRewardsInUsd = tokenPrice.mul(tokensPerInterval).mul(86400).mul(365).div(expandDecimals(1, 30)).div(expandDecimals(1, tokenDecimals))
       annualRewardsInUsd = annualRewardsInUsd.add(tokenAnnualRewardsInUsd);
     }
+
     const apr = annualRewardsInUsd.mul(10000).mul(expandDecimals(1, USD_DECIMALS)).div(qlpPrice).div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)))
     return apr.toNumber() / 100;
   }, [allTokensPerInterval, quickPrice, infoTokens, qlpSupply, qlpPrice, chainId])
@@ -377,7 +356,7 @@ export default function QlpSwap(props) {
         const rewardInUsd = quickPrice.mul(reward).div(expandDecimals(1, 18))
         totalRewardsInUsd.current = totalRewardsInUsd.current.add(rewardInUsd);
         totalApr.current = totalRewardsInUsd.current.mul
-        result.push({ token: { address: claimableTokens[i], symbol: "QUICK", displayDecimals: 4 }, reward, rewardInUsd });
+        result.push({ token: { address: claimableTokens[i], symbol: "QUICK", rewardDisplayDecimals: 2 }, reward, rewardInUsd });
       } else {
         const token = infoTokens[claimableTokens[i]];
         if (token) {
@@ -812,7 +791,7 @@ export default function QlpSwap(props) {
                     <div className="label">Old Wallet Rewards
                     </div>
                     <div className="value">
-                      {formatAmount(oldQlpRewards, QLP_DECIMALS, 4, true)} QLP ($
+                      {formatAmount(oldQlpRewards, QLP_DECIMALS, 4, true)} WETH ($
                       {formatAmount(oldQlpRewardsUsd, USD_DECIMALS, 2, true)})
                     </div>
                   </div>

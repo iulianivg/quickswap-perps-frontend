@@ -217,11 +217,9 @@ export function useAllTokensPerInterval(library, chainId) {
     const contract = new ethers.Contract(feeQlpDistributorAddress, FeeQlpDistributor.abi, provider);
     const _allTokensPerInterval = []
     contract.getAllRewardTokens().then(tokens => {
-      console.log("useAllTokensPerInterval", tokens);
       for (let i = 0; i < tokens.length; i++) {
         const tokenAddress = tokens[i];
         contract.tokensPerInterval(tokenAddress).then(tokensPerInterval => {
-          console.log("tokensPerInterval", tokensPerInterval);
           _allTokensPerInterval.push([tokenAddress, tokensPerInterval])
           if (_allTokensPerInterval.length === tokens.length) {
             setAllTokensPerInterval(_allTokensPerInterval);
