@@ -174,7 +174,7 @@ export const platformTokens = {
       name: "Quickperp LP",
       symbol: "QLP",
       decimals: 18,
-      address: getContract(POLYGON_ZKEVM, "StakedQlpTracker"),
+      address: getContract(POLYGON_ZKEVM, "FeeQlpTracker"),
       imageUrl: "https://res.cloudinary.com/quickperp/image/upload/v1662984581/website-assets/qlp-token.png",
     },
   },
