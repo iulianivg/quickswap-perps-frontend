@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { gql } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useSWR from "swr";
 
 import OrderBook from "../abis/OrderBook.json";
@@ -10,6 +10,7 @@ import Router from "../abis/Router.json";
 import VaultReader from "../abis/VaultReader.json";
 import ReferralStorage from "../abis/ReferralStorage.json";
 import PositionRouter from "../abis/PositionRouter.json";
+import FeeQlpDistributor from "../abis/FeeQlpDistributor.json";
 
 import { getContract,  } from "../Addresses";
 import { getConstant } from "../Constants";
@@ -139,6 +140,58 @@ export function useInfoTokens(library, chainId, active, tokenBalances, fundingRa
   };
 }
 
+//return 30decimal usd price
+export function useQuickUsdPrice() {
+  const defaultPrice = expandDecimals(5, 28);
+  const fetcher = (url) => fetch(url).then((r) => r.json());
+
+  const { data, error } = useSWR("https://api.coingecko.com/api/v3/simple/price?ids=quickswap&vs_currencies=usd", {
+    dedupingInterval: 60000,
+    fetcher: fetcher,
+  });
+  return data ? expandDecimals(Number(data["quickswap"]["usd"]) * 1e6, 24) : defaultPrice;
+}
+
+export function useCoingeckoPrices(symbol) {
+  // token ids https://api.coingecko.com/api/v3/coins
+  const _symbol = {
+    BTC: "bitcoin",
+    ETH: "ethereum",
+    MATIC: "matic-network",
+    WBTC: "wrapped-bitcoin",
+    USDC: "usd-coin",
+    USDT: "tether",
+    DAI: "dai",
+    QUICK: "quickswap",
+  }[symbol];
+
+  const _defaultPrice = {
+    BTC: 27000,
+    ETH: 1800,
+    MATIC: 0.8,
+    WBTC: 27000,
+    USDC: 1,
+    USDT: 1,
+    DAI: 1,
+    QUICK: 0.044,
+  }[symbol];
+
+  const { res, error } = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd`, {
+    dedupingInterval: 60000,
+    fetcher: fetcher,
+  });
+
+  const data = useMemo(() => {
+    if (!res || res[symbol] ||  res[symbol]["usd"] === 0) {
+      return expandDecimals(_defaultPrice * 1e6, 24);
+    }
+
+    return expandDecimals(Number(res[_symbol]["usd"]) * 1e6, 24);
+  }, [res]);
+
+  return data;
+}
+
 export function useUserStat(chainId) {
   const query = gql(`{
     userStat(id: "total") {
@@ -155,6 +208,32 @@ export function useUserStat(chainId) {
 
   return res ? res.data.userStat : null;
 }
+
+export function useAllTokensPerInterval(library, chainId) {
+  const [allTokensPerInterval, setAllTokensPerInterval] = useState([]);
+  useEffect(() => {
+    const provider = getProvider(library, chainId);
+    const feeQlpDistributorAddress = getContract(chainId, "FeeQlpDistributor");
+    const contract = new ethers.Contract(feeQlpDistributorAddress, FeeQlpDistributor.abi, provider);
+    const _allTokensPerInterval = []
+    contract.getAllRewardTokens().then(tokens => {
+      for (let i = 0; i < tokens.length; i++) {
+        const tokenAddress = tokens[i];
+        contract.tokensPerInterval(tokenAddress).then(tokensPerInterval => {
+          _allTokensPerInterval.push([tokenAddress, tokensPerInterval])
+          if (_allTokensPerInterval.length === tokens.length) {
+            setAllTokensPerInterval(_allTokensPerInterval);
+          }
+        })
+      }
+    })
+      .catch((e) => { console.log("e", e) });
+  }, [setAllTokensPerInterval, library, chainId])
+
+  return [allTokensPerInterval, setAllTokensPerInterval]
+}
+
+
 
 export function useLiquidationsData(chainId, account) {
   const [data, setData] = useState(null);

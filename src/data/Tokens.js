@@ -12,7 +12,8 @@ const TOKENS = {
       coingeckoUrl: "https://www.coingecko.com/en/coins/ethereum",
       isNative: true,
       isShortable: true,
-      displayDecimals:2
+      displayDecimals:2,
+      rewardDisplayDecimals: 4,
     },
     {
       name: "Wrapped Ether",
@@ -22,7 +23,8 @@ const TOKENS = {
       coingeckoUrl: "https://www.coingecko.com/en/coins/ethereum",
       isWrapped: true,
       baseSymbol: "ETH",
-      displayDecimals:2
+      displayDecimals:2,
+      rewardDisplayDecimals: 4,
     },
     {
       name: "Bitcoin",
@@ -31,7 +33,8 @@ const TOKENS = {
       coingeckoUrl: "https://www.coingecko.com/en/coins/bitcoin",
       decimals: 8,
       isShortable: true,
-      displayDecimals:2
+      displayDecimals:2,
+      rewardDisplayDecimals: 4,
     },
     {
       name: "Matic",
@@ -40,7 +43,8 @@ const TOKENS = {
       address: "0xa2036f0538221a77A3937F1379699f44945018d0",
       coingeckoUrl: "https://www.coingecko.com/en/coins/polygon",
       isShortable: true,
-      displayDecimals:4
+      displayDecimals:4,
+      rewardDisplayDecimals: 2,
     },
     {
       name: "USDC",
@@ -49,7 +53,8 @@ const TOKENS = {
       coingeckoUrl: "https://www.coingecko.com/en/coins/usd-coin",
       decimals: 6,
       isStable: true,
-      displayDecimals:4
+      displayDecimals:4,
+      rewardDisplayDecimals: 2,
     },
     {
       name: "USDT",
@@ -58,7 +63,8 @@ const TOKENS = {
       coingeckoUrl: "https://www.coingecko.com/en/coins/tether",
       decimals: 6,
       isStable: true,
-      displayDecimals:4
+      displayDecimals:4,
+      rewardDisplayDecimals: 2,
     },
     {
       name: "Dai",
@@ -67,7 +73,8 @@ const TOKENS = {
       coingeckoUrl: "https://www.coingecko.com/en/coins/dai",
       decimals: 18,
       isStable: true,
-      displayDecimals:4
+      displayDecimals:4,
+      rewardDisplayDecimals: 2,
     },
 
   ],
