@@ -264,7 +264,7 @@ function AppHeaderUser({
   useEffect(() => {
     if (active) {
       setWalletModalVisible(false);
-      currentTour.current?.show(2);
+      if (currentTour.current?.isActive()) currentTour.current?.show(2);
     }
   }, [active, setWalletModalVisible]);
 
@@ -342,8 +342,6 @@ function FullApp() {
       // it triggers event with chainId = 1
       // reload helps web3 to return correct chain data
       return window.ethereum.on("chainChanged", () => {
-        localStorage.removeItem(SHOULD_EAGER_CONNECT_LOCALSTORAGE_KEY);
-        localStorage.removeItem(CURRENT_PROVIDER_LOCALSTORAGE_KEY);
         document.location.reload();
       });
     }
