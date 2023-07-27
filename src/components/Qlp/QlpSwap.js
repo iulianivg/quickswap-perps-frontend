@@ -175,7 +175,7 @@ export default function QlpSwap(props) {
       fetcher: fetcher(library, RewardTracker),
     }
   );
-  
+
   const redemptionTime = lastPurchaseTime ? lastPurchaseTime.add(QLP_COOLDOWN_DURATION) : undefined;
   const inCooldownWindow = redemptionTime && parseInt(Date.now() / 1000) < redemptionTime;
 
@@ -320,30 +320,36 @@ export default function QlpSwap(props) {
   const [allTokensPerInterval,] = useAllTokensPerInterval(library, chainId)
 
 
-  const apr = useMemo(() => {
+  const [apr, tokensApr] = useMemo(() => {
     let annualRewardsInUsd = bigNumberify(0);
-    if (!Array.isArray(allTokensPerInterval) && allTokensPerInterval.length === 0) return;
-    if (qlpSupply.eq(0)) return;
+    let tokensApr = []
+    if (!Array.isArray(allTokensPerInterval) && allTokensPerInterval.length === 0) return [,];
+    if (qlpSupply.eq(0)) return  [,];
     for (let i = 0; i < allTokensPerInterval.length; i++) {
+      let tokenApr = {}
       const [tokenAddress, tokensPerInterval] = allTokensPerInterval[i];
       let tokenPrice = bigNumberify(0)
       let tokenDecimals = 18;
       if (tokenAddress === getContract(chainId, "QUICK")) {
         tokenPrice = quickPrice;
+        tokenApr.symbol = "QUICK"
       } else {
         const token = infoTokens[tokenAddress];
         if (token && token.maxPrice) {
+          tokenApr.symbol = token.symbol
           tokenPrice = token.maxPrice;
           tokenDecimals = token.decimals
         }
       }
 
       const tokenAnnualRewardsInUsd = tokenPrice.mul(tokensPerInterval).mul(86400).mul(365).div(expandDecimals(1, 30)).div(expandDecimals(1, tokenDecimals))
+      tokenApr.apr = tokenAnnualRewardsInUsd.mul(10000).mul(expandDecimals(1, USD_DECIMALS)).div(qlpPrice).div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)))/100
+      tokensApr.push(tokenApr)
       annualRewardsInUsd = annualRewardsInUsd.add(tokenAnnualRewardsInUsd);
     }
 
     const apr = annualRewardsInUsd.mul(10000).mul(expandDecimals(1, USD_DECIMALS)).div(qlpPrice).div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)))
-    return apr.toNumber() / 100;
+    return [apr.toNumber() / 100, tokensApr];
   }, [allTokensPerInterval, quickPrice, infoTokens, qlpSupply, qlpPrice, chainId])
 
   const rewardTokens = useMemo(() => {
@@ -821,30 +827,32 @@ export default function QlpSwap(props) {
               <div>
                 <div className="label">APR</div>
                 <div className="value flex">
-                  <span className="positive" style={{ marginRight: 6 }}>
+                  {/* <span className="positive" style={{ marginRight: 6 }}>
                     {apr || "..."}%
-                  </span>
-                  {/* <Tooltip
+                  </span> */}
+                  <Tooltip
                     className="positive"
-                    handle={`${formatAmount(totalApr, 2, 2, true)}%`}
+                    handle={`${apr || "..."}%`}
                     position="right-bottom"
                     renderContent={() => {
+                      console.log("tokensApr", tokensApr);
                       return (
                         <>
-                          <div className="Tooltip-row">
-                            <span className="label">
-                              {nativeTokenSymbol} ({wrappedTokenSymbol}) APR
-                            </span>
-                            <span>{formatAmount(feeQlpTrackerApr, 2, 2, false)}%</span>
-                          </div>
-                          <div className="Tooltip-row">
-                            <span className="label">Escrowed QPX APR</span>
-                            <span>{formatAmount(stakedQlpTrackerApr, 2, 2, false)}%</span>
-                          </div>
+                          {tokensApr && tokensApr.map(t => {
+                            return (
+                            <div className="Tooltip-row">
+                              <span className="label">
+                                {t.symbol} APR
+                              </span>
+                              <span>{t.apr}%</span>
+                            </div>
+                            )
+                          })
+                          }
                         </>
                       );
                     }}
-                  /> */}
+                  />
                 </div>
               </div>
             </div>
