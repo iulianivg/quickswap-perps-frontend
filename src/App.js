@@ -13,6 +13,8 @@ import HeaderNav from "./HeaderNav";
 
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 
+import useInitWeb3Onboard from "./hooks/useInitWeb3Onboard";
+
 import {
   DEFAULT_SLIPPAGE_AMOUNT,
   SLIPPAGE_BPS_KEY,
@@ -78,7 +80,6 @@ import ReferralTerms from "./views/ReferralTerms/ReferralTerms";
 import { ModalProvider } from "./components/Modal/ModalProvider";
 //import { WebSocketProvider } from "./utils/websocket-provider";
 
-import { initWeb3Onboard } from "./web3OnboardService";
 import { Web3OnboardProvider, useConnectWallet } from "@web3-onboard/react";
 
 import useWeb3Onboard from "./hooks/useWeb3Onboard";
@@ -840,11 +841,7 @@ function PreviewApp() {
 }
 
 function App() {
-  const [web3Onboard, setWeb3Onboard] = useState(null);
-
-  useEffect(() => {
-    setWeb3Onboard(initWeb3Onboard);
-  }, []);
+  const { web3Onboard } = useInitWeb3Onboard();
 
   if (!web3Onboard) return <div>Loading...</div>;
 

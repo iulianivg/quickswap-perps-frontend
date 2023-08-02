@@ -1159,51 +1159,6 @@ export function formatDate(time) {
   return formatDateFn(time * 1000, "dd MMM yyyy");
 }
 
-export function hasMetaMaskWalletExtension() {
-  return window.ethereum;
-}
-
-export function hasExodusWalletExtension() {
-  return window.exodus;
-}
-
-export function hasCoinBaseWalletExtension() {
-  const { ethereum } = window;
-
-  if (!ethereum?.providers && !ethereum?.isCoinbaseWallet) {
-    return false;
-  }
-  return window.ethereum.isCoinbaseWallet || ethereum.providers.find(({ isCoinbaseWallet }) => isCoinbaseWallet);
-}
-
-export function activateInjectedProvider(providerName) {
-  const { ethereum } = window;
-
-  if (!ethereum?.providers && !ethereum?.isCoinbaseWallet && !ethereum?.isMetaMask && !ethereum?.isExodus) {
-    return undefined;
-  }
-
-  let provider;
-  if (ethereum?.providers) {
-    switch (providerName) {
-      case "CoinBase":
-        provider = ethereum.providers.find(({ isCoinbaseWallet }) => isCoinbaseWallet);
-        break;
-      case "Exodus":
-        provider = ethereum.providers.find(({ isExodus }) => isExodus);
-        break;
-      case "MetaMask":
-      default:
-        provider = ethereum.providers.find(({ isMetaMask }) => isMetaMask);
-        break;
-    }
-  }
-
-  if (provider) {
-    ethereum.setSelectedProvider(provider);
-  }
-}
-
 export function useChainId() {
   let { chainId } = useWeb3Onboard();
 
