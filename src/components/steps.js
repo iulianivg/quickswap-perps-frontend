@@ -2088,7 +2088,7 @@ const newSteps = [
   },
   
   {
-    id: "feedback",
+    id: "Closefeedback",
     title: "",    
     when:{
       show:function(){
