@@ -1677,7 +1677,7 @@ const newSteps = [
     classes: "shepherd shepherd-welcome",
     buttons: [
       {
-        type:'complete',
+        type:'hide',
         text: `
         <div style="
         display: flex;
@@ -1687,7 +1687,7 @@ const newSteps = [
         `,
       },
       {
-        type:'cancel',
+        type:'hide',
         disabled:true,
         classes:"submit-feedback-button",
         text: `
@@ -1805,7 +1805,17 @@ const newSteps = [
     },
     when: {
       show: function() {
-        document.querySelector(`[data-label='${document.querySelector('.PositionSellerTabs .active').innerHTML}']`).click()   
+        document.querySelector(`[data-label='${document.querySelector('.PositionSellerTabs .active').innerHTML}']`).click()
+        document.querySelector(".PositionSellerTabs").querySelectorAll('.Tab-option').forEach((element) => {
+          element.addEventListener('click',()=>{
+            document.querySelector(".positionSeller-list-tabs").querySelectorAll('.tour-tab').forEach((e) => {
+                e.classList.remove("tour-selected-tab");
+                if(element.innerHTML === e.innerHTML){
+                  e.classList.add("tour-selected-tab")
+                }
+            })
+          })
+        })
       }
     },
     text: `
@@ -1830,19 +1840,6 @@ const newSteps = [
         text: `
         <div style="
         <div class="skip">Skip</div>
-        `,
-      },
-      {
-        type: "back",
-        text: `
-        <div style="
-        display: flex;
-        align-items: center;">
-            <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11.667 5.99972L1.00033 5.99971M1.00033 5.99971L5.66699 10.6664M1.00033 5.99971L5.66699 1.33305" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-            <div class="back">Prev</div>
-            </div>
         `,
       },
       {
@@ -1969,7 +1966,7 @@ const newSteps = [
     title: "",
     showOn(){
       let swapPptionV2 = JSON.parse(localStorage.getItem('Swap-option-v2'))
-      return (Object.values(swapPptionV2).includes("Long") === true  && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit' && document.querySelector(".PositionSellerTabs .active").innerHTML === 'Market');
+      return (Object.values(swapPptionV2).includes("Long") === true  && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit' && (document.querySelector(".PositionSellerTabs .active").innerHTML === 'Market' || document.querySelector(".PositionSellerTabs .active").innerHTML === 'Trigger'));
     },
     when: {
       show: function() {
@@ -1977,6 +1974,11 @@ const newSteps = [
         document.querySelectorAll(".CloseModalMarketCheckPaperLabel").forEach(e=> {
           e.innerHTML =  Object.values(swapPptionV2).includes("Long") === true ? 'Long' : 'Short'
         })  
+        if(document.querySelector(".close-transaction-button").hasAttribute("disabled")){
+          document.querySelector(".CloseModalMarketCheckPaperButton").disabled = true;
+        }else{
+          document.querySelector(".CloseModalMarketCheckPaperButton").disabled = false;
+        }
       }
     },
     text: `
@@ -2021,6 +2023,7 @@ const newSteps = [
       },
       {
         type: "next",
+        classes:'CloseModalMarketCheckPaperButton',
         text: `
         <div class="s-next">
         <div>Next</div>
@@ -2038,7 +2041,7 @@ const newSteps = [
     title: "",
     showOn(){
       let swapPptionV2 = localStorage.getItem('Swap-option-v2') && JSON.parse(localStorage.getItem('Swap-option-v2'));
-      return ( (Object.values(swapPptionV2).includes("Long") === true || Object.values(swapPptionV2).includes("Short") === true)  && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit' && document.querySelector(".PositionSellerTabs .active").innerHTML === 'Market' );
+      return ( (Object.values(swapPptionV2).includes("Long") === true || Object.values(swapPptionV2).includes("Short") === true)  && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit' && (document.querySelector(".PositionSellerTabs .active").innerHTML === 'Market' || document.querySelector(".PositionSellerTabs .active").innerHTML === 'Trigger'));
     },
     text: `
     </div>
@@ -2071,7 +2074,6 @@ const newSteps = [
       {
         action(){
           document.querySelector(".close-transaction-button").click();  
-          this.next();
         },
         
         text: `
@@ -2099,7 +2101,7 @@ const newSteps = [
                 document.querySelector('.feedback-rating .active').classList.remove('active')
               }
             e.classList.add('active')
-            document.querySelector('.submit-feedback-button').disabled = false
+            document.querySelector('.submit-close-feedback-button').disabled = false
           })
         })  
       }
@@ -2134,7 +2136,7 @@ const newSteps = [
       {
         type:'complete',
         disabled:true,
-        classes:"submit-feedback-button",
+        classes:"submit-close-feedback-button",
         text: `
         <div class="s-next">
         <div >Submit</div>

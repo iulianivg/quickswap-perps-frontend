@@ -125,6 +125,12 @@ export default function PositionsList(props) {
   };
 
   const { currentTour } = useUIContext();
+ const closePosition = (position) =>{
+  sellPosition(position); 
+   if (currentTour.current?.isActive()) { 
+    setTimeout(()=>{currentTour.current?.show('CloseModal');},100) 
+     }; 
+ } 
   return (
     <div className="PositionsList">
       <PositionEditor
@@ -643,7 +649,7 @@ export default function PositionsList(props) {
                 <td>
                   <button
                     className={`Exchange-list-action close-action  ${index === 0 && "exchange-list-close-action"}`}
-                    onClick={() => {sellPosition(position); if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.show('CloseModal');},100) }; }}
+                    onClick={() =>closePosition(position)}
                     disabled={position.size.eq(0)}
                   >
                     Close
