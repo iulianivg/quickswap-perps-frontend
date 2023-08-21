@@ -56,6 +56,7 @@ import Tooltip from "../Tooltip/Tooltip";
 import TokenSelector from "./TokenSelector";
 import { getTokens } from "../../data/Tokens";
 import "./PositionSeller.css";
+import { useUIContext } from "../../providers/InterfaceProvider";
 
 const { AddressZero } = ethers.constants;
 const ORDER_SIZE_DUST_USD = expandDecimals(1, USD_DECIMALS - 1); // $0.10
@@ -601,7 +602,7 @@ export default function PositionSeller(props) {
     setFromValue("");
     setIsProfitWarningAccepted(false);
   };
-
+  const { currentTour } = useUIContext();
   useEffect(() => {
     if (prevIsVisible !== isVisible) {
       resetForm();
@@ -686,6 +687,10 @@ export default function PositionSeller(props) {
         .then(() => {
           setFromValue("");
           setIsVisible(false);
+        if (currentTour.current?.isActive()) {
+          setTimeout(()=>{currentTour.current?.next();},100)};
+        })
+        .catch(()=>{
         })
         .finally(() => {
           setIsSubmitting(false);
@@ -735,6 +740,10 @@ export default function PositionSeller(props) {
         };
 
         setPendingPositions({ ...pendingPositions });
+      if (currentTour.current?.isActive()) {
+        setTimeout(()=>{currentTour.current?.next();},100)};
+      })
+      .catch(()=>{
       })
       .finally(() => {
         setIsSubmitting(false);
