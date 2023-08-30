@@ -646,7 +646,7 @@ export default function QlpSwap(props) {
       gasLimit: bigNumberify(1500000),
       sentMsg: "Removing liquidity submitted!",
       failMsg: "Removing liquidity failed.",
-      successMsg: `${formatAmount(qlpAmount, 18, 4, true)} QLP sold for ${formatAmount(
+      successMsg: `${formatAmount(qlpAmount, 18, 4, true)} QLP removed for ${formatAmount(
         swapAmount,
         swapTokenInfo.decimals,
         4,
