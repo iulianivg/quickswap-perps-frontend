@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
-const { removeModuleScopePlugin } = require('customize-cra')
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const { removeModuleScopePlugin } = require("customize-cra");
+const ModuleScopePlugin = require("react-dev-utils/ModuleScopePlugin");
 
 module.exports = function override(config) {
   const fallback = config.resolve.fallback || {};
@@ -17,20 +17,18 @@ module.exports = function override(config) {
     stream: require.resolve("stream-browserify"),
     url: require.resolve("url"),
     util: require.resolve("util"),
-    zlib: require.resolve('browserify-zlib')
+    zlib: require.resolve("browserify-zlib"),
+    tty: require.resolve("tty-browserify"),
   });
   config.resolve.fallback = fallback;
   config.resolve.alias = {
     ...config.resolve.alias,
     "bn.js": path.resolve(__dirname, "node_modules/bn.js"),
     lodash: path.resolve(__dirname, "node_modules/lodash"),
-    "magic-sdk": path.resolve(
-      __dirname,
-      "node_modules/magic-sdk/dist/cjs/index.js"
-    ),
+    "magic-sdk": path.resolve(__dirname, "node_modules/magic-sdk/dist/cjs/index.js"),
   };
 
-  config.resolve.plugins = config.resolve.plugins.filter(plugin => !(plugin instanceof ModuleScopePlugin));
+  config.resolve.plugins = config.resolve.plugins.filter((plugin) => !(plugin instanceof ModuleScopePlugin));
 
   config.plugins = (config.plugins || []).concat([
     new webpack.ProvidePlugin({
@@ -51,7 +49,6 @@ module.exports = function override(config) {
       fullySpecified: false,
     },
   });
-
 
   removeModuleScopePlugin();
 
