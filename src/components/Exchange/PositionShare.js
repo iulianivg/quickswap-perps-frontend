@@ -129,7 +129,7 @@ function PositionShare({ setIsPositionShareModalOpen, isPositionShareModalOpen, 
               rel="noreferrer"
               href={tweetLink}
             >
-              <img src={FiTwitter} alt="Twitter" />
+              <img src={FiTwitter} alt="Twitter" width={14} />
               Tweet
             </a>
           </div>
