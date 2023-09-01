@@ -641,13 +641,12 @@ export default function QlpSwap(props) {
       swapTokenAddress === AddressZero
         ? [qlpAmount, minOut, account]
         : [swapTokenAddress, qlpAmount, minOut, account];
-    console.log("🚀 ~ file: QlpSwap.js:578 ~ sellQlp ~ params:", params)
 
     callContract(chainId, contract, method, params, {
       gasLimit: bigNumberify(1500000),
-      sentMsg: "Sell submitted!",
-      failMsg: "Sell failed.",
-      successMsg: `${formatAmount(qlpAmount, 18, 4, true)} QLP sold for ${formatAmount(
+      sentMsg: "Removing liquidity submitted!",
+      failMsg: "Removing liquidity failed.",
+      successMsg: `${formatAmount(qlpAmount, 18, 4, true)} QLP removed for ${formatAmount(
         swapAmount,
         swapTokenInfo.decimals,
         4,
