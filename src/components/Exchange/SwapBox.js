@@ -1571,14 +1571,6 @@ export default function SwapBox(props) {
       USD_DISPLAY_DECIMALS
     )} USD.`;
 
-    fireEvent("trade", {
-      user_address: account,
-      network: getChainName(chainId),
-      contract_address: contractAddress,
-      asset_amount: formatAmount(boundedFromAmount, fromToken.decimals, 4, true),
-      asset_ticker: fromToken.symbol,
-    });
-
     Api.callContract(chainId, contract, method, params, {
       gasLimit: bigNumberify(600000),
       value,
