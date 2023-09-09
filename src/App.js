@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
 import { SWRConfig } from "swr";
 import { ethers } from "ethers";
 
@@ -88,6 +88,7 @@ import { ModalProvider } from "./components/Modal/ModalProvider";
 import { Web3OnboardProvider, useConnectWallet } from "@web3-onboard/react";
 
 import useWeb3Onboard from "./hooks/useWeb3Onboard";
+import { UIContextProvider, useUIContext } from "./providers/InterfaceProvider";
 
 if ("ethereum" in window) {
   window.ethereum.autoRefreshOnNetworkChange = false;
@@ -265,15 +266,6 @@ function AppHeaderUser({
     } catch (e) {
       console.log(e);
     }
-  };
-  useEffect(() => {
-
-  }, [tour?.getCurrentStep()]);
-
-  const getTour = () => {
-    tour?.start()
-    setWalletModalVisible(true)
-    // tour?.cancel()
   };
 
   if (!active) {
@@ -537,8 +529,8 @@ function FullApp() {
   }, [active, chainId, vaultAddress, positionRouterAddress]);
 
   return (
-    <Tour>
-      <div className="App">
+    <>
+        <div className="App">
         {/* <img style={{ position: "absolute" }} src={backgroundLight} alt="background-light" /> */}
         {/* <div className="App-background-side-1"></div>
         <div className="App-background-side-2"></div>
@@ -770,7 +762,7 @@ function FullApp() {
           </button>
         </div>
       </Modal>
-    </Tour>
+    </>
   );
 }
 
@@ -869,11 +861,14 @@ function App() {
 
   return (
     <SWRConfig value={{ refreshInterval: 15000, dedupingInterval: 5000 }}>
-      <Web3OnboardProvider web3Onboard={web3Onboard}>
-        <SEO>
-          <FullApp />
-        </SEO>
-      </Web3OnboardProvider>
+      <UIContextProvider>
+        <Web3OnboardProvider web3Onboard={web3Onboard}>
+          <SEO>
+            <FullApp />
+          </SEO>
+        </Web3OnboardProvider>
+      </UIContextProvider>
+
     </SWRConfig>
   );
 }
