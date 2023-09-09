@@ -15,20 +15,9 @@ import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 
 import useInitWeb3Onboard from "./hooks/useInitWeb3Onboard";
 
-import { useSafeAppConnection, SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react';
-
-import Logo from "./assets/logos/QuickswapLogo@2x.png";
-import qlp24Icon from "./img/ic_qlp_24.svg";
-import NotFound from "./404";
 import "shepherd.js/dist/css/shepherd.css";
-import NewBadge from "./assets/icons/new.svg";
-import { Web3ReactProvider, useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
 import { ShepherdTourContext } from "react-shepherd";
 
-import HeaderNav from "./HeaderNav";
-
-import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 
 import {
   DEFAULT_SLIPPAGE_AMOUNT,
