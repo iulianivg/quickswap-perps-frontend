@@ -52,7 +52,6 @@ export default {
 			// console.log('Resolving that symbol....', symbol_stub)
 		}, 0)
 
-
 	},
 	getBars: function(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
 		// console.log('=====getBars running')

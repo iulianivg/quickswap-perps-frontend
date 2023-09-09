@@ -259,7 +259,7 @@ function AppHeaderUser({
   const { account, active, library, chainId } = useWeb3Onboard();
 
   const [{ wallet }, connect, disconnect] = useConnectWallet();
-  const tour = useContext(ShepherdTourContext);
+  const { currentTour } = useUIContext();
 
   useEffect(() => {
     if (active) {
@@ -549,7 +549,6 @@ function FullApp() {
 
   return (
     <Tour>
-
       <div className="App">
         {/* <img style={{ position: "absolute" }} src={backgroundLight} alt="background-light" /> */}
         {/* <div className="App-background-side-1"></div>
