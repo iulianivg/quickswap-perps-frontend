@@ -317,7 +317,6 @@ function FullApp() {
 
   const { account, active, library, chainId } = useWeb3Onboard();
   const [{ wallet }, connect, disconnect] = useConnectWallet();
-  const tour = useContext(ShepherdTourContext);
 
   useEventToast();
 
