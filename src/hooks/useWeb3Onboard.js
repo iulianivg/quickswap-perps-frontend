@@ -17,7 +17,7 @@ export default function useWeb3Onboard() {
 
   const SUPPORTED_CHAINS = [POLYGON_ZKEVM];
 
-  useEffect(async () => {
+  useEffect(() => {
     if (!wallet) {
       setWrongChain(false);
     }
@@ -36,10 +36,10 @@ export default function useWeb3Onboard() {
       } else {
         // not supported chain == wrong chain
         setWrongChain(true);
-        setActive(false);      
+        setActive(false);
         setAccount(null);
         setEnsName(null);
-        setChain({chainId:POLYGON_ZKEVM});
+        setChain({ chainId: POLYGON_ZKEVM });
       }
     }
   }, [wallet, connectedChain]);
@@ -48,7 +48,6 @@ export default function useWeb3Onboard() {
     if (wallet?.provider) {
       // const account = wallet.accounts[0].address;
       // const { name, avatar } = wallet?.accounts[0].ens ?? {};
-
       // setActive(true);
       // setAccount(account);
       // setEnsName(name);
