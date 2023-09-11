@@ -67,6 +67,8 @@ import Stake from "../../views/Stake/Stake";
 import useWeb3Onboard from "../../hooks/useWeb3Onboard";
 import useMasaAnalytics from "../../hooks/useMasaAnalytics";
 
+import { WaitlistWidget } from "rm-react-components";
+
 const { AddressZero } = ethers.constants;
 
 export default function QlpSwap(props) {
@@ -1051,6 +1053,18 @@ export default function QlpSwap(props) {
               </div>
             </div>
           </div>
+          <WaitlistWidget
+            environment={2}
+            address={account}
+            subscriptionType="emailAndTelegram"
+            waitlistName="QuickSwapWaitlist"
+            title="Insured deposits: Sign-up for the QuickSwap Perp Insurance Waitlist"
+            successText="Congratulations! You have been added to the QuickSwap Perp Insurance waiting list."
+            option1="Smart contract hack risk and Oracle attack - 3%/year"
+            option2="zkEVM availability & zkEVM Bridge risk - 2.5%/year"
+            option3="Stablecoin depeg risk - USDT, USDC, DAI de-peg caused QLP value loss - 3%/year"
+          />
+
           <div className="QlpSwap-cta Exchange-swap-button-container">
             <button className="App-cta Exchange-swap-button" onClick={onClickPrimary} disabled={!isPrimaryEnabled()}>
               {getPrimaryText()}
