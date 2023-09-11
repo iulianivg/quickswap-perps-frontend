@@ -38,6 +38,7 @@ import {
   POLYGON_ZKEVM,
   PLACEHOLDER_ACCOUNT,
   QPXQLP_DISPLAY_DECIMALS,
+  getChainName,
 } from "../../Helpers";
 
 import { callContract, useAllTokensPerInterval, useInfoTokens, useQuickInfo } from "../../Api";
@@ -64,6 +65,7 @@ import AssetDropdown from "../../views/Dashboard/AssetDropdown";
 import { getImageUrl } from "../../cloudinary/getImageUrl";
 import Stake from "../../views/Stake/Stake";
 import useWeb3Onboard from "../../hooks/useWeb3Onboard";
+import useMasaAnalytics from "../../hooks/useMasaAnalytics";
 
 import { WaitlistWidget } from "rm-react-components";
 
@@ -632,6 +634,8 @@ export default function QlpSwap(props) {
     });
   };
 
+  const { fireEvent } = useMasaAnalytics();
+
   const buyQlp = () => {
     setIsSubmitting(true);
 
@@ -655,6 +659,13 @@ export default function QlpSwap(props) {
       .then(async () => {})
       .finally(() => {
         setIsSubmitting(false);
+        fireEvent("addLiquidity", {
+          user_address: account,
+          network: getChainName(chainId),
+          contract_address: rewardRouterAddress,
+          asset_amount: formatAmount(swapAmount, swapTokenInfo.decimals, 4, true),
+          asset_ticker: swapTokenInfo.symbol,
+        });
       });
   };
 
