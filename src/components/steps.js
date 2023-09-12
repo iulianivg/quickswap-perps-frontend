@@ -77,20 +77,7 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-      {
-        type: "back",
-        classes:'step3BackButton',
-        text: `
-        <div style="
-        display: flex;
-        align-items: center;">
-            <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11.667 5.99972L1.00033 5.99971M1.00033 5.99971L5.66699 10.6664M1.00033 5.99971L5.66699 1.33305" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-            <div class="back">Prev</div>
-            </div>
-        `,
-      },
+    
       {
         type:'next',
         text: `
