@@ -30,6 +30,41 @@ const activeTourStep = (selector, event) => {
 
 const newSteps = [
   {
+    id: "welcome",
+    title: "",
+    text: [
+      `
+      <div class="s-title">Connect your web3 wallet</div>
+      <div class="s-description">A non-custodial web3 wallet serves as a gateway to use dApps. It is your web3 identity, pro tip: never share your private keys.</div>
+        `,
+    ],
+    attachTo: { element: ".App-header-user", on: "bottom" },
+    classes: "shepherd shepherd-welcome",
+    
+    buttons: [
+      {
+        type:'complete',
+        text: `
+        <div class="skip">Skip</div>
+        `,
+      },
+      {
+        action(){
+          document.querySelector('.connect-wallet').click()
+        },
+        text: `
+        <div class="s-next">
+        <div>Next</div>
+        <div style="width: 100%; height: 100%; margin-bottom: 1.1px; margin-left: 4px">
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+       </div>
+        `,
+      },
+    ],
+  },
+  {
     id: "step3",
     classes: "shepherd-expanded",
     title: "",

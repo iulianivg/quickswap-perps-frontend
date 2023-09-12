@@ -255,7 +255,7 @@ function AppHeaderUser({
     if (active) {
       setWalletModalVisible(false);
       if (localStorage.getItem("viewed_tour") !== "true") {
-        currentTour.current.start();
+        if(currentTour.current?.isActive()) currentTour.current.show('step3')
       }
     }
   }, [active, setWalletModalVisible]);
@@ -264,8 +264,13 @@ function AppHeaderUser({
 
   const handleConnectWallet = async () => {
     try {
-      await connect();
-    } catch (e) {
+      if(currentTour.current?.isActive()) currentTour.current.hide('welcome')
+      await connect().then(res=>{
+        if (localStorage.getItem("viewed_tour") !== "true") {
+          if(currentTour.current?.isActive()) res.length !== 0 ? currentTour.current.show('step3') : currentTour.current.show('welcome')
+        }
+      })
+    }catch (e) {
       console.log(e);
     }
   };
