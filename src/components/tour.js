@@ -24,7 +24,7 @@ function InnerTour({ children }) {
       // Show tour on load only if user hasn't viewed it before
       if (localStorage.getItem("viewed_tour") !== "true") {
         currentTour.current = tour;
-        tour.start();
+        //tour.start();
         tour.on('complete', () => {
           // document.body.style.overflow = '';
           localStorage.setItem("viewed_tour", "true")

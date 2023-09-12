@@ -254,7 +254,9 @@ function AppHeaderUser({
   useEffect(() => {
     if (active) {
       setWalletModalVisible(false);
-      if (currentTour.current?.isActive()) currentTour.current?.show(2);
+      if (localStorage.getItem("viewed_tour") !== "true") {
+        currentTour.current.start();
+      }
     }
   }, [active, setWalletModalVisible]);
 
@@ -347,7 +349,8 @@ function FullApp() {
 
   const [walletModalVisible, setWalletModalVisible] = useState();
 
-  const connectWallet = async () => {
+  const connectWallet = async () => {   
+    //if (currentTour.current?.isActive()) currentTour.current.show("installation");
     await connect();
   };
 
