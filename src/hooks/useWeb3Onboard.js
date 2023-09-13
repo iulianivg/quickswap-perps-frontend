@@ -39,7 +39,7 @@ export default function useWeb3Onboard() {
         setActive(false);
         setAccount(null);
         setEnsName(null);
-        setChain({ chainId: POLYGON_ZKEVM });
+        // setChain({ chainId: POLYGON_ZKEVM });
       }
     }
   }, [wallet, connectedChain]);
