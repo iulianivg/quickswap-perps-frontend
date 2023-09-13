@@ -40,7 +40,7 @@ const newSteps = [
     ],
     attachTo: { element: ".App-header-user", on: "bottom" },
     classes: "shepherd shepherd-welcome",
-    
+
     buttons: [
       {
         type:'complete',
@@ -71,7 +71,7 @@ const newSteps = [
     when: {
       show: function() {
         let swapPptionV2 = localStorage.getItem('Swap-option-v2')  && JSON.parse(localStorage.getItem('Swap-option-v2'));
-        Object.values(swapPptionV2).length > 0 && document.querySelector(`[data-label='${Object.values(swapPptionV2)[0].split(',')[0]}']`).click()        
+        Object.values(swapPptionV2).length > 0 && document.querySelector(`[data-label='${Object.values(swapPptionV2)[0].split(',')[0]}']`).click()
         let isConnected = localStorage.getItem('eagerconnect') && JSON.parse(localStorage.getItem('eagerconnect'));
         let isProvider =  localStorage.getItem('currentprovider')
         if(isConnected === true && isProvider != null ){
@@ -99,7 +99,7 @@ const newSteps = [
 
               <button class="tour-tab"  type="button" data-label='Swap'  onClick='new Promise(function (resolve) {
                 [...document.querySelector(".step-3-tour-tabs").children].forEach((element, index) => {element.classList.remove("tour-selected-tab");}); [...document.querySelector(".step-3-tour-tabs").children][2].classList.add("tour-selected-tab");[...document.querySelector(".tradePage").children].forEach((element, index) => {if (index == 2) {element.classList.add("active");element.click()} else {element.classList.remove("active");}});resolve();});document.querySelector(".tour-tab-container").innerHTML = "This means the direct exchange of one type of cryptocurrency for another.";'>Swap</button>
-          </div> 
+          </div>
         </div>
       </div>
       <div class="tour-tab-container s-description" >This means you buy a cryptocurrency, like Bitcoin, because you believe its price will increase in the future. You&prime;re planning to &ldquo;go long,&rdquo; or profit from an increase in its price.</div>
@@ -112,7 +112,7 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-    
+
       {
         type:'next',
         text: `
@@ -122,12 +122,12 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
     ],
-  }, 
+  },
   {
     id: "step4",
     title: "",
@@ -140,7 +140,7 @@ const newSteps = [
         Object.values(swapPptionV2).includes("Swap") !== true ?  document.querySelector("[data-label='Trigger']").style.display = 'block' : document.querySelector("[data-label='Trigger']").style.display = 'none'
         if(JSON.parse(localStorage.getItem('["Order-option"]') === "Stop")){
           document.querySelector(".step4NextButton").disabled = true;
-        } 
+        }
         document.querySelector(".Exchange-swap-order-type-tabs").querySelectorAll('.Tab-option').forEach((element) => {
           element.addEventListener('click',()=>{
             document.querySelector(".step-4-tour-tabs").querySelectorAll('.tour-tab').forEach((e) => {
@@ -162,8 +162,8 @@ const newSteps = [
 
             <button class="tour-tab" data-label="Trigger"  type="button" onClick='new Promise(function (resolve) {document.querySelector(".step4NextButton").disabled = true;[...document.querySelector(".step-4-tour-tabs").children].forEach((element, index) => {element.classList.remove("tour-selected-tab");}); [...document.querySelector(".step-4-tour-tabs").children][2].classList.add("tour-selected-tab");[...document.querySelector(".Exchange-swap-order-type-tabs").children].forEach((element, index) => {if (index == 2) {element.classList.add("active");element.click()} else {element.classList.remove("active");}});resolve();});document.querySelector(".tour-sub-tab-container").innerHTML = "This is a special type of order that starts as soon as a specific price is reached. It&prime;s like setting an alarm to remind you to buy a toy when its price drops to a certain point.";'>Trigger</button>
               <div id="content"></div>
-              
-        </div> 
+
+        </div>
       </div>
     </div>
     <div class="tour-sub-tab-container s-description" >This is when you buy or sell a cryptocurrency immediately at the best available price in the market. It&prime;s like buying a toy at the price it&prime;s currently being sold for.</div>
@@ -206,12 +206,12 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
     ],
-  },  
+  },
 
 
   {
@@ -249,7 +249,7 @@ const newSteps = [
     <br/></div>
             `,
     attachTo: { element: ".pay-exchange", on: "left" },
-    
+
     buttons: [
       {
         action(){
@@ -286,7 +286,7 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
@@ -325,7 +325,7 @@ const newSteps = [
     want to <span class="exchange"></span></div>
             `,
     attachTo: { element: ".long-exchange", on: "left" },
-    
+
     buttons: [
       {
         action(){
@@ -367,7 +367,7 @@ const newSteps = [
         `,
       },
     ],
-  }, 
+  },
 
 
   {
@@ -385,14 +385,14 @@ const newSteps = [
        }else if( Object.values(swapPptionV2).includes("Short") === true){
         document.querySelector(".price-label").innerHTML = 'Short'
        }
-       
+
       }
     },
     text: `
     <div class="s-subTitle">Enter the price at which you want to initiate the <span class="price-label"></span></div>
             `,
     attachTo: { element: ".price-exchange", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -418,7 +418,7 @@ const newSteps = [
         `,
       },
       {
-       
+
         type: "next",
         text: `
         <div class="s-next">
@@ -427,7 +427,7 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
@@ -450,13 +450,13 @@ const newSteps = [
       show: function() {
         if(document.querySelector('.leverage-btn').innerHTML === 'Enable Leverage'){
           localStorage.setItem("HideEnableLeverageStep", 'false')
-        }       
+        }
         if(document.querySelector(".Exchange-swap-button").hasAttribute("disabled")){
           document.querySelector(".leverageSlider-button").disabled = true;
         }
       }
     },
-    
+
     text: `
     <div class="s-title">Choose the leverage </div>
     <div class="s-description">"Leverage" in trading is using borrowed funds to amplify your investment, potentially increasing both gains and losses. Be cautious, don’t use too much leverage.</div>
@@ -468,7 +468,7 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-      { 
+      {
         action(){
           addStepActionClasses()
           localStorage.setItem("viewed_tour_modal", "false")
@@ -527,7 +527,7 @@ const newSteps = [
     <div class="s-description">A token that you want to exchange for another token.</div>
             `,
     attachTo: { element: ".pay-exchange", on: "left" },
-    
+
     buttons: [
       {
         action(){
@@ -538,7 +538,7 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-      { 
+      {
         type:'back',
         text: `
         <div style="
@@ -603,7 +603,7 @@ const newSteps = [
     <div class="s-description">Select the token that you want against the primary token.</div>
             `,
     attachTo: { element: ".long-exchange", on: "left" },
-    
+
     buttons: [
       {
         action(){
@@ -615,8 +615,8 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-      { 
-       
+      {
+
         type:'back',
         text: `
         <div style="
@@ -634,13 +634,13 @@ const newSteps = [
           clearInterval()
           removeStepActionClasses()
           localStorage.setItem("viewed_tour_modal","true")
-          
+
             if(document.querySelector('.swap-button').innerHTML.includes("Approve")  ){
               this.show('ApproveSwap')
             }else{
               this.show('letsSwap')
             }
-          
+
         },
         classes:'swapReceive-Step-Next',
         text: `
@@ -664,7 +664,7 @@ const newSteps = [
     },
     when: {
       show: function() {
-        
+
           setInterval(() => {
             if(!document.querySelector('.swap-button').innerHTML.includes("Approve")){
               document.querySelector('.letsSwapNext').click()
@@ -680,7 +680,7 @@ const newSteps = [
     <div class="s-title">Approve Token</div>
            `,
     attachTo: { element: ".swap-button", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -688,8 +688,8 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-      { 
-       
+      {
+
         action(){
           addStepActionClasses()
           localStorage.setItem("viewed_tour_modal","false")
@@ -708,7 +708,7 @@ const newSteps = [
       },
       {
         action(){
-          
+
           if(document.querySelector('.swap-button').innerHTML.includes("Approve")  ){
             document.querySelector(".swap-button").click();
           }
@@ -739,7 +739,7 @@ const newSteps = [
     <div class="s-description">Click on Confirm and a popup from your connected wallet will appear. You need to click again to confirm or approve depending on the wallet you use to sign the transaction.</div>
             `,
     attachTo: { element: ".swap-button", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -747,7 +747,7 @@ const newSteps = [
         <div class="skip">Skip</div>
         `,
       },
-      { 
+      {
         action(){
           addStepActionClasses()
           localStorage.setItem("viewed_tour_modal","false")
@@ -803,11 +803,11 @@ const newSteps = [
         <li><span style="font-weight:700;">Price Impact:</span> Price Impact is the change in token price directly caused by your trade, make sure to not move the market.</li>
        </ul>
     </div>
-     
+
 
     `,
     attachTo: { element: ".Modal-content.Confirmation-box-content", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -817,8 +817,8 @@ const newSteps = [
       },
       {
         action(){
-          document.querySelector(".Confirmation-box .Modal-close-button").click(); 
-         
+          document.querySelector(".Confirmation-box .Modal-close-button").click();
+
           this.show('letsSwap');
         },
         classes:'CheckPaperWorkSwapLimit',
@@ -876,7 +876,7 @@ const newSteps = [
     <div class="s-subTitle">Enter the price at which you want to initiate the swap</div>
             `,
     attachTo: { element: ".price-swap", on: "left" },
-    
+
     buttons: [
       {
         action(){
@@ -891,7 +891,7 @@ const newSteps = [
         action(){
           clearInterval()
           addStepActionClasses()
-          
+
           localStorage.setItem("viewed_tour_modal","false")
           this.back();
         },
@@ -907,7 +907,7 @@ const newSteps = [
         `,
       },
       {
-       
+
         action(){
           clearInterval()
           this.next()
@@ -921,7 +921,7 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
@@ -949,7 +949,7 @@ const newSteps = [
     Thank you for swapping on QuickSwap :)</div>
             `,
     attachTo: { element: ".checkStatus", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -977,14 +977,14 @@ const newSteps = [
     title: "",
     showOn(){
       let swapPptionV2 = JSON.parse(localStorage.getItem('Swap-option-v2'))
-      return (Object.values(swapPptionV2).includes("Long") === true   && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit' && localStorage.getItem("HideEnableLeverageStep")  === 'false');  
-         
+      return (Object.values(swapPptionV2).includes("Long") === true   && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit' && localStorage.getItem("HideEnableLeverageStep")  === 'false');
+
     },
     text: `<div class="s-title">Enable Leverage</div>
     <div class="s-description">Click on Enable Leverage and Sign the transaction in wallet for Leverage to be enabled. This is a one-time process.</div>`,
     attachTo: { element: ".leverage-btn", on: "left" },
 
-    
+
     buttons: [
       {
         type:'complete',
@@ -1008,9 +1008,9 @@ const newSteps = [
       {
         action(){
           document.querySelector(".Exchange-swap-button").click();
-          this.next();   
+          this.next();
         },
-        
+
         text: `
         <div class="s-next">
         <div>Next</div>
@@ -1044,17 +1044,17 @@ const newSteps = [
         if(!document.querySelector("#DisclaimerCheckAll").hasAttribute("checked")){
           document.querySelector("#DisclaimerCheckAll").disabled = true;
         }
-        document.querySelectorAll(".Disclaimer-checkbox").forEach(e=> e.click()); 
+        document.querySelectorAll(".Disclaimer-checkbox").forEach(e=> e.click());
          if(document.querySelector(".Disclaimer-button").hasAttribute("disabled")){
         document.querySelector(".Disclaimer-Step-Next").disabled = false;
       }resolve();});
         ' name="DisclaimerCheckAll" id="DisclaimerCheckAll"> Check checkbox</label>
       </div>
     `,
-    
+
     attachTo: { element: ".Disclaimer-content", on: "left" },
 
-    
+
     buttons: [
       {
         type:'complete',
@@ -1077,8 +1077,8 @@ const newSteps = [
       },
       {
         action(){
-          
-          document.querySelector(".Disclaimer-button").click();   
+
+          document.querySelector(".Disclaimer-button").click();
           this.next();
         },
         classes:'Disclaimer-Step-Next',
@@ -1114,11 +1114,11 @@ const newSteps = [
     text: `
     </div>
     <div class="s-subTitle"> Click on <span class="ClickOnSwapLongShortTokenLabel"></span> ETH</div>
-    
+
             `,
     attachTo: { element: ".long-short-swap-button", on: "left" },
 
-    
+
     buttons: [
       {
         type:'complete',
@@ -1142,7 +1142,7 @@ const newSteps = [
       {
         classes:'ClickOnSwapLongShortTokenNext',
         action(){
-          document.querySelector(".long-short-swap-button").click();   
+          document.querySelector(".long-short-swap-button").click();
         },
         text: `
         <div class="s-next">
@@ -1155,8 +1155,8 @@ const newSteps = [
         `,
       },
     ],
-  },  
- 
+  },
+
   {
     id: "CheckPaperWorkNotLimit",
     title: "",
@@ -1172,7 +1172,7 @@ const newSteps = [
         document.querySelector('.Exchange-swap-box').querySelector('.Modal-close-button').addEventListener('click',()=>{
           document.querySelector('.CheckPaperWorkNotLimitBackButton').click()
         })
-      })  
+      })
       }
     },
     text: `
@@ -1190,7 +1190,7 @@ const newSteps = [
     </div>
     `,
     attachTo: { element: ".Modal-content.Confirmation-box-content", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1202,7 +1202,7 @@ const newSteps = [
         action(){
           this.show('ClickOnSwapLongShortToken')
           if(!!document.querySelector('.Exchange-swap-box').querySelector('.Confirmation-box')){
-            document.querySelector(".Confirmation-box .Modal-close-button").click(); 
+            document.querySelector(".Confirmation-box .Modal-close-button").click();
           }
         },
         classes:'CheckPaperWorkNotLimitBackButton',
@@ -1234,7 +1234,7 @@ const newSteps = [
       },
     ],
   },
- 
+
 
 
 
@@ -1250,7 +1250,7 @@ const newSteps = [
     to initiate placing a limit order trade</div>
             `,
     attachTo: { element: ".Exchange-swap-button", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1260,7 +1260,7 @@ const newSteps = [
       },
       {
         type: "back",
-       
+
         text: `
         <div style="
         display: flex;
@@ -1274,7 +1274,7 @@ const newSteps = [
       },
       {
         action(){
-          document.querySelector(".Exchange-swap-button").click(); 
+          document.querySelector(".Exchange-swap-button").click();
         },
         text: `
         <div class="s-next">
@@ -1287,7 +1287,7 @@ const newSteps = [
         `,
       },
     ],
-  },  
+  },
 
 
 
@@ -1303,7 +1303,7 @@ const newSteps = [
     <div class="s-description">Check the mark to accept the terms and conditions, click on the accept terms to enable orders and sign the transaction in your wallet to enable it.</div>
             `,
     attachTo: { element: ".enable-orders", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1326,8 +1326,8 @@ const newSteps = [
       },
       {
         action(){
-          document.querySelector(".enable-order-button").click(); 
-          this.next();  
+          document.querySelector(".enable-order-button").click();
+          this.next();
         },
         text: `
         <div class="s-next">
@@ -1352,7 +1352,7 @@ const newSteps = [
         let swapPptionV2 = JSON.parse(localStorage.getItem('Swap-option-v2'))
         document.querySelectorAll(".createOrderLabel").forEach(e=> {
           e.innerHTML =  Object.values(swapPptionV2).includes("Long") === true ? 'Long' : Object.values(swapPptionV2).includes("Short") === true ? 'Short' : 'Swap'
-        })  
+        })
         document.querySelector('.Exchange-swap-box').querySelector('.Modal-close-button').addEventListener('click',()=>{
           document.querySelector('.createOrderBackButton').click()
         })
@@ -1372,7 +1372,7 @@ const newSteps = [
       Click on Create Order and sign the transaction to initiate the Limit <span class="createOrderLabel"></span> trade.
     </div> `,
     attachTo: { element: ".Confirmation-box-content", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1384,7 +1384,7 @@ const newSteps = [
         action(){
           this.show('createLimitOrder')
           if(!!document.querySelector('.Exchange-swap-box').querySelector('.Confirmation-box')){
-            document.querySelector(".Confirmation-box .Modal-close-button").click(); 
+            document.querySelector(".Confirmation-box .Modal-close-button").click();
           }
         },
         classes:'createOrderBackButton',
@@ -1401,7 +1401,7 @@ const newSteps = [
       },
       {
         action(){
-          document.querySelector(".Confirmation-box-swap-button").click(); 
+          document.querySelector(".Confirmation-box-swap-button").click();
         },
         text: `
         <div class="s-next">
@@ -1442,7 +1442,7 @@ const newSteps = [
   //   Check your created Limit <span class="OrderTabsLabel">Long</span> order under the orders tab.</div>
   //   `,
   //   attachTo: { element: ".charts-list-tabs .active", on: "left" },
-    
+
   //   buttons: [
   //     {
   //       type:'complete',
@@ -1465,7 +1465,7 @@ const newSteps = [
   //     },
   //     {
   //       action(){
-  //         this.next();  
+  //         this.next();
   //       },
   //       text: `
   //       <div class="s-next">
@@ -1483,7 +1483,7 @@ const newSteps = [
   //   id: "OrderEdit",
   //   title: "",
   //   showOn(){
-     
+
   //     return ( document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML === 'Limit');
   //   },
   //   when: {
@@ -1499,7 +1499,7 @@ const newSteps = [
   //     </div>
   //   `,
   //   attachTo: { element: ".edit-tour-button", on: "left" },
-    
+
   //   buttons: [
   //     {
   //       type:'complete',
@@ -1545,7 +1545,7 @@ const newSteps = [
   //     <div class="s-subTitle">To cancel the order, press on cancel and Sign the transaction.</div>
   //   `,
   //   attachTo: { element: ".cancel-tour-button", on: "left" },
-    
+
   //   buttons: [
   //     {
   //       type:'complete',
@@ -1568,7 +1568,7 @@ const newSteps = [
   //     },
   //     {
   //       action(){
-  //         this.next();  
+  //         this.next();
   //       },
   //       text: `
   //       <div class="s-next">
@@ -1587,11 +1587,11 @@ const newSteps = [
 
   {
     id: "feedback",
-    title: "",    
+    title: "",
     when:{
       show:function(){
         document.querySelector('.feedback-rating').querySelectorAll('li').forEach(e=>{
-          
+
           e.addEventListener('click',()=>{
             if(document.querySelector('.feedback-rating .active')){
                 document.querySelector('.feedback-rating .active').classList.remove('active')
@@ -1599,13 +1599,13 @@ const newSteps = [
             e.classList.add('active')
             document.querySelector('.submit-feedback-button').disabled = false
           })
-        })  
+        })
       }
     },
     text: [
       `
       <div class="s-title">Rate your experience</div>
-      
+
       <div style="text-align:center">
         <ul class="feedback-rating">
           <li><img src="/feedback1.svg"/></li>
@@ -1640,7 +1640,7 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
@@ -1662,7 +1662,7 @@ const newSteps = [
   //   `,
   //   attachTo: { element: ".position-heading", on: "top" },
 
-    
+
   //   buttons: [
   //     {
   //       type:'complete',
@@ -1672,7 +1672,7 @@ const newSteps = [
   //     },
   //     {
   //       action(){
-  //         this.next(); 
+  //         this.next();
   //       },
   //       text: `
   //       <div class="s-next">
@@ -1685,7 +1685,7 @@ const newSteps = [
   //       `,
   //     },
   //   ],
-  // }, 
+  // },
   // {
   //   id: "closeAction",
   //   title: "",
@@ -1700,7 +1700,7 @@ const newSteps = [
   //   `,
   //   attachTo: { element: ".exchange-list-close-action", on: "top" },
 
-    
+
   //   buttons: [
   //     {
   //       type:'complete',
@@ -1723,8 +1723,8 @@ const newSteps = [
   //     },
   //     {
   //       action(){
-  //         document.querySelector(".exchange-list-close-action").click();  
-  //         this.next(); 
+  //         document.querySelector(".exchange-list-close-action").click();
+  //         this.next();
   //       },
   //       text: `
   //       <div class="s-next">
@@ -1764,13 +1764,13 @@ const newSteps = [
     text: `
       <div style="display: flex; justify-content: space-between; align-items: center" >
         <div class="s-title">Choose from </div>
-        
+
           <div class="positionSeller-list-tabs" style="margin: 10px 0;display: flex; align-items: center; gap: 10px; font-size: 12px;">
               <button class="tour-tab tour-selected-tab" data-label="Market"  type="button" onClick='new Promise(function (resolve) {[...document.querySelector(".positionSeller-list-tabs").children].forEach((element, index) => {element.classList.remove("tour-selected-tab");}); [...document.querySelector(".positionSeller-list-tabs").children][0].classList.add("tour-selected-tab");[...document.querySelector(".PositionSellerTabs").children].forEach((element, index) => {if (index == 0) {element.classList.add("active"); element.click()} else {element.classList.remove("active");}});resolve();});document.querySelector(".tour-tab-container-1").innerHTML = "This is when you sell a cryptocurrency immediately at the best available price in the market.";'>Market</button>
               <button class="tour-tab"  type="button" data-label="Trigger"  onClick='new Promise(function (resolve) {
                 [...document.querySelector(".positionSeller-list-tabs").children].forEach((element, index) => {element.classList.remove("tour-selected-tab");}); [...document.querySelector(".positionSeller-list-tabs").children][1].classList.add("tour-selected-tab");[...document.querySelector(".PositionSellerTabs").children].forEach((element, index) => {if (index == 1) {element.classList.add("active");element.click()} else {element.classList.remove("active");}});resolve();});document.querySelector(".tour-tab-container-1").innerHTML = "This is a special type of order that starts as soon as a specific price is reached. It&prime;s like setting an alarm to remind you to sell your crypto when its price reaches a certain point.";'>Trigger</button>
 
-          </div> 
+          </div>
         </div>
       </div>
       <div class="tour-tab-container-1" style="width: 100%; color: #213062; font-size: 16px; font-family: Space Grotesk; font-weight: 400; line-height: 24px; word-wrap: break-word">This is when you sell a cryptocurrency immediately at the best available price in the market.
@@ -1786,7 +1786,7 @@ const newSteps = [
         `,
       },
       {
-       
+
         type: "next",
         text: `
         <div class="s-next">
@@ -1795,7 +1795,7 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
@@ -1809,14 +1809,14 @@ const newSteps = [
       return ((Object.values(swapPptionV2).includes("Short") === true || Object.values(swapPptionV2).includes("Long") === true ) && document.querySelector(".Exchange-swap-order-type-tabs .active").innerHTML !== 'Limit'  && (document.querySelector(".PositionSellerTabs .active").innerHTML === 'Market' || document.querySelector(".PositionSellerTabs .active").innerHTML === 'Trigger')
       );
     },
-   
+
     text: `
     </div>
     <div class="s-subTitle">Enter the amount which you want to close. Clicking on Max will autofill the complete amount.</div>
-    
+
     `,
     attachTo: { element: ".PositionSellerTabs-amount", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1869,7 +1869,7 @@ const newSteps = [
     <div class="s-title">Enter Closing Price</div>
     <div class="s-description">Enter the price at which you wish to Close the <span class="CloseModalClosingPriceLabel">Long</span> trade.</div> `,
     attachTo: { element: ".positionSellerTabs-closing-amount", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1916,7 +1916,7 @@ const newSteps = [
         let swapPptionV2 = JSON.parse(localStorage.getItem('Swap-option-v2'))
         document.querySelectorAll(".CloseModalMarketCheckPaperLabel").forEach(e=> {
           e.innerHTML =  Object.values(swapPptionV2).includes("Long") === true ? 'Long' : 'Short'
-        })  
+        })
         if(document.querySelector(".close-transaction-button").hasAttribute("disabled")){
           document.querySelector(".CloseModalMarketCheckPaperButton").disabled = true;
         }else{
@@ -1926,9 +1926,9 @@ const newSteps = [
     },
     text: `
     </div>
-    
+
     <div class="s-title">Check the paperwork
-    to <span class="CloseModalMarketCheckPaperLabel">Long</span></div>
+    to close <span class="CloseModalMarketCheckPaperLabel">Long</span></div>
     <div class="s-description">
       <ul>
         <li><span style=" font-weight: 700;">Mkt Price:</span> It shows the current market price.</li>
@@ -1938,12 +1938,12 @@ const newSteps = [
         <li><span style="font-weight:700;">Fees:</span> The fees you are paying to execute the trade.</li>
         <li><span style="font-weight:700;">PnL:</span> Profit or Loss on your trade that you wish to close.</li>
       </ul>
-      Click on Long and sign the transaction to initiate the class="CloseModalMarketCheckPaperLabel">Long</span> trade.
+      Click on Long and sign the transaction to initiate the Long trade.
     </div>
-    
+
     `,
     attachTo: { element: ".PositionSeller-modal-content", on: "left" },
-    
+
     buttons: [
       {
         type:'complete',
@@ -1993,7 +1993,7 @@ const newSteps = [
             `,
     attachTo: { element: ".Exchange-swap-button", on: "left" },
 
-    
+
     buttons: [
       {
         type:'complete',
@@ -2016,9 +2016,9 @@ const newSteps = [
       },
       {
         action(){
-          document.querySelector(".close-transaction-button").click();  
+          document.querySelector(".close-transaction-button").click();
         },
-        
+
         text: `
         <div class="s-next">
         <div>Next</div>
@@ -2031,14 +2031,14 @@ const newSteps = [
       },
     ],
   },
-  
+
   {
     id: "Closefeedback",
-    title: "",    
+    title: "",
     when:{
       show:function(){
         document.querySelector('.feedback-rating').querySelectorAll('li').forEach(e=>{
-          
+
           e.addEventListener('click',()=>{
             if(document.querySelector('.feedback-rating .active')){
                 document.querySelector('.feedback-rating .active').classList.remove('active')
@@ -2046,13 +2046,13 @@ const newSteps = [
             e.classList.add('active')
             document.querySelector('.submit-close-feedback-button').disabled = false
           })
-        })  
+        })
       }
     },
     text: [
       `
       <div class="s-title">Rate your experience</div>
-      
+
       <div style="text-align:center">
         <ul class="feedback-rating">
           <li><img src="/feedback1.svg"/></li>
@@ -2087,7 +2087,7 @@ const newSteps = [
         <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M3.16699 7.99967H13.8337M9.16699 3.33301L13.8337 7.99967L9.16699 12.6663" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
+
     </div>
         `,
       },
