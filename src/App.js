@@ -136,8 +136,6 @@ function WrongChainButton() {
             Switch to Polygon zkEVM
           </div>
         </div>
-
-
         </>
       )}
     </>
@@ -354,7 +352,7 @@ function FullApp() {
 
   const [walletModalVisible, setWalletModalVisible] = useState();
 
-  const connectWallet = async () => {   
+  const connectWallet = async () => {
     //if (currentTour.current?.isActive()) currentTour.current.show("installation");
     await connect();
   };
