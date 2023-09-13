@@ -542,7 +542,11 @@ function FullApp() {
   const { pathname } = location;
   useEffect(() => {
     const page = `https://perps.quickswap.exchange/#${pathname}`;
-    firePageViewEvent({ page, user_address: account });
+    if (account) {
+      firePageViewEvent({ page, user_address: account });
+    } else {
+      firePageViewEvent({ page });
+    }
   }, [pathname]);
 
   const wallet_type = wallet?.label;
