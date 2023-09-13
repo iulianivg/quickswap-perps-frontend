@@ -38,6 +38,7 @@ import {
   POLYGON_ZKEVM,
   PLACEHOLDER_ACCOUNT,
   QPXQLP_DISPLAY_DECIMALS,
+  getChainName,
 } from "../../Helpers";
 
 import { callContract, useAllTokensPerInterval, useInfoTokens, useQuickInfo } from "../../Api";
@@ -64,6 +65,9 @@ import AssetDropdown from "../../views/Dashboard/AssetDropdown";
 import { getImageUrl } from "../../cloudinary/getImageUrl";
 import Stake from "../../views/Stake/Stake";
 import useWeb3Onboard from "../../hooks/useWeb3Onboard";
+import useMasaAnalytics from "../../hooks/useMasaAnalytics";
+
+import { WaitlistWidget } from "rm-react-components";
 
 const { AddressZero } = ethers.constants;
 
@@ -106,7 +110,6 @@ export default function QlpSwap(props) {
   const tokensForBalanceAndSupplyQuery = [qlpAddress, usdqAddress];
 
   const tokenAddresses = tokens.map((token) => token.address);
-
 
   const { data: tokenBalances } = useSWR(
     [`QlpSwap:getTokenBalances:${active}`, chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT],
@@ -163,7 +166,13 @@ export default function QlpSwap(props) {
     }
   );
   const { data: oldQlpBalance } = useSWR(
-    [`QlpSwap:oldQlpBalance:${active}`, chainId, oldStakedQlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT],
+    [
+      `QlpSwap:oldQlpBalance:${active}`,
+      chainId,
+      oldStakedQlpTrackerAddress,
+      "stakedAmounts",
+      account || PLACEHOLDER_ACCOUNT,
+    ],
     {
       fetcher: fetcher(library, RewardTracker),
     }
@@ -222,8 +231,7 @@ export default function QlpSwap(props) {
     isBuying && swapTokenAddress !== AddressZero && tokenAllowance && swapAmount && swapAmount.gt(tokenAllowance);
 
   const swapUsdMin = getUsd(swapAmount, swapTokenAddress, false, infoTokens);
-  const qlpUsdMax =
-    qlpAmount && qlpPrice ? qlpAmount.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS)) : undefined;
+  const qlpUsdMax = qlpAmount && qlpPrice ? qlpAmount.mul(qlpPrice).div(expandDecimals(1, QLP_DECIMALS)) : undefined;
 
   let isSwapTokenCapReached;
   if (swapTokenInfo.managedUsd && swapTokenInfo.maxUsdqAmount) {
@@ -250,7 +258,13 @@ export default function QlpSwap(props) {
   const quickInfo = useQuickInfo(POLYGON_ZKEVM);
   // let quickPrice = quickInfo ? Number(quickInfo.derivedMatic) * Number(formatAmount(nativeToken.minPrice, USD_DECIMALS, 6)) : 0;
 
-  const quickPrice = (quickInfo && nativeToken && nativeToken.minPrice) ? nativeToken.minPrice.mul(Math.round(Number(quickInfo.derivedMatic) * 10 ** 8 * 10 ** 8)).div(10 ** 8).div(10 ** 8) : bigNumberify(0);
+  const quickPrice =
+    quickInfo && nativeToken && nativeToken.minPrice
+      ? nativeToken.minPrice
+          .mul(Math.round(Number(quickInfo.derivedMatic) * 10 ** 8 * 10 ** 8))
+          .div(10 ** 8)
+          .div(10 ** 8)
+      : bigNumberify(0);
 
   // const quickAPR = useMemo(() => {
   //   if (quickPrice > 0 && qlpSupplyUsd && qlpSupplyUsd > 0) {
@@ -307,7 +321,6 @@ export default function QlpSwap(props) {
   //   totalApr = totalApr.add(stakedQlpTrackerApr);
   // }
 
-
   // const quickPrice = useCoingeckoPrices("QUICK");
 
   const { data: claimableAll } = useSWR(
@@ -317,62 +330,79 @@ export default function QlpSwap(props) {
     }
   );
 
-  const [allTokensPerInterval,] = useAllTokensPerInterval(library, chainId)
-
+  const [allTokensPerInterval] = useAllTokensPerInterval(library, chainId);
 
   const [apr, tokensApr] = useMemo(() => {
     let annualRewardsInUsd = bigNumberify(0);
-    let tokensApr = []
+    let tokensApr = [];
     if (!Array.isArray(allTokensPerInterval) && allTokensPerInterval.length === 0) return [,];
-    if (qlpSupply.eq(0)) return  [,];
+    if (qlpSupply.eq(0)) return [,];
     for (let i = 0; i < allTokensPerInterval.length; i++) {
-      let tokenApr = {}
+      let tokenApr = {};
       const [tokenAddress, tokensPerInterval] = allTokensPerInterval[i];
-      let tokenPrice = bigNumberify(0)
+      let tokenPrice = bigNumberify(0);
       let tokenDecimals = 18;
       if (tokenAddress === getContract(chainId, "QUICK")) {
         tokenPrice = quickPrice;
-        tokenApr.symbol = "QUICK"
+        tokenApr.symbol = "QUICK";
       } else {
         const token = infoTokens[tokenAddress];
         if (token && token.maxPrice) {
-          tokenApr.symbol = token.symbol
+          tokenApr.symbol = token.symbol;
           tokenPrice = token.maxPrice;
-          tokenDecimals = token.decimals
+          tokenDecimals = token.decimals;
         }
       }
 
-      const tokenAnnualRewardsInUsd = tokenPrice.mul(tokensPerInterval).mul(86400).mul(365).div(expandDecimals(1, 30)).div(expandDecimals(1, tokenDecimals))
-      tokenApr.apr = tokenAnnualRewardsInUsd.mul(10000).mul(expandDecimals(1, USD_DECIMALS)).div(qlpPrice).div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)))/100
-      tokensApr.push(tokenApr)
+      const tokenAnnualRewardsInUsd = tokenPrice
+        .mul(tokensPerInterval)
+        .mul(86400)
+        .mul(365)
+        .div(expandDecimals(1, 30))
+        .div(expandDecimals(1, tokenDecimals));
+      tokenApr.apr =
+        tokenAnnualRewardsInUsd
+          .mul(10000)
+          .mul(expandDecimals(1, USD_DECIMALS))
+          .div(qlpPrice)
+          .div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS))) / 100;
+      tokensApr.push(tokenApr);
       annualRewardsInUsd = annualRewardsInUsd.add(tokenAnnualRewardsInUsd);
     }
 
-    const apr = annualRewardsInUsd.mul(10000).mul(expandDecimals(1, USD_DECIMALS)).div(qlpPrice).div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)))
+    const apr = annualRewardsInUsd
+      .mul(10000)
+      .mul(expandDecimals(1, USD_DECIMALS))
+      .div(qlpPrice)
+      .div(qlpSupply.div(expandDecimals(1, USDQ_DECIMALS)));
     return [apr.toNumber() / 100, tokensApr];
-  }, [allTokensPerInterval, quickPrice, infoTokens, qlpSupply, qlpPrice, chainId])
+  }, [allTokensPerInterval, quickPrice, infoTokens, qlpSupply, qlpPrice, chainId]);
 
   const rewardTokens = useMemo(() => {
     if (!Array.isArray(claimableAll) || claimableAll.length !== 2) return [];
-    const [claimableTokens, claimableRewards] = claimableAll
+    const [claimableTokens, claimableRewards] = claimableAll;
     const result = [];
     for (let i = 0; i < claimableTokens.length; i++) {
       const reward = claimableRewards[i];
       if (claimableTokens[i] === getContract(chainId, "QUICK")) {
-        const rewardInUsd = quickPrice.mul(reward).div(expandDecimals(1, 18))
+        const rewardInUsd = quickPrice.mul(reward).div(expandDecimals(1, 18));
         totalRewardsInUsd.current = totalRewardsInUsd.current.add(rewardInUsd);
-        totalApr.current = totalRewardsInUsd.current.mul
-        result.push({ token: { address: claimableTokens[i], symbol: "QUICK", rewardDisplayDecimals: 2 }, reward, rewardInUsd });
+        totalApr.current = totalRewardsInUsd.current.mul;
+        result.push({
+          token: { address: claimableTokens[i], symbol: "QUICK", rewardDisplayDecimals: 2 },
+          reward,
+          rewardInUsd,
+        });
       } else {
         const token = infoTokens[claimableTokens[i]];
         if (token) {
-          const rewardInUsd = token.maxPrice && token.maxPrice.mul(reward).div(expandDecimals(1, token.decimals))
+          const rewardInUsd = token.maxPrice && token.maxPrice.mul(reward).div(expandDecimals(1, token.decimals));
           result.push({ token, reward, rewardInUsd });
         }
       }
     }
     return result;
-  }, [claimableAll, chainId, quickPrice, infoTokens])
+  }, [claimableAll, chainId, quickPrice, infoTokens]);
 
   useEffect(() => {
     const updateSwapAmounts = () => {
@@ -604,6 +634,8 @@ export default function QlpSwap(props) {
     });
   };
 
+  const { fireEvent } = useMasaAnalytics();
+
   const buyQlp = () => {
     setIsSubmitting(true);
 
@@ -619,13 +651,21 @@ export default function QlpSwap(props) {
       value,
       sentMsg: "Providing...",
       failMsg: "Add Liquidity failed.",
-      successMsg: `${formatAmount(swapAmount, swapTokenInfo.decimals, 4, true)} ${swapTokenInfo.symbol
-        } provided for ${formatAmount(qlpAmount, 18, 4, true)} QLP !`,
+      successMsg: `${formatAmount(swapAmount, swapTokenInfo.decimals, 4, true)} ${
+        swapTokenInfo.symbol
+      } provided for ${formatAmount(qlpAmount, 18, 4, true)} QLP !`,
       setPendingTxns,
     })
-      .then(async () => { })
+      .then(async () => {})
       .finally(() => {
         setIsSubmitting(false);
+        fireEvent("addLiquidity", {
+          user_address: account,
+          network: getChainName(chainId),
+          contract_address: rewardRouterAddress,
+          asset_amount: formatAmount(swapAmount, swapTokenInfo.decimals, 4, true),
+          asset_ticker: swapTokenInfo.symbol,
+        });
       });
   };
 
@@ -638,9 +678,7 @@ export default function QlpSwap(props) {
     const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemQlpETH" : "unstakeAndRedeemQlp";
 
     const params =
-      swapTokenAddress === AddressZero
-        ? [qlpAmount, minOut, account]
-        : [swapTokenAddress, qlpAmount, minOut, account];
+      swapTokenAddress === AddressZero ? [qlpAmount, minOut, account] : [swapTokenAddress, qlpAmount, minOut, account];
 
     callContract(chainId, contract, method, params, {
       gasLimit: bigNumberify(1500000),
@@ -654,12 +692,11 @@ export default function QlpSwap(props) {
       )} ${swapTokenInfo.symbol}!`,
       setPendingTxns,
     })
-      .then(async () => { })
+      .then(async () => {})
       .finally(() => {
         setIsSubmitting(false);
       });
   };
-
 
   const migrateStaking = () => {
     setIsSubmitting(true);
@@ -673,7 +710,7 @@ export default function QlpSwap(props) {
       successMsg: `Migration succeeded`,
       setPendingTxns,
     })
-      .then(async () => { })
+      .then(async () => {})
       .finally(() => {
         setIsSubmitting(false);
       });
@@ -780,28 +817,37 @@ export default function QlpSwap(props) {
                 {formatAmount(qlpBalanceUsd, USD_DECIMALS, 2, true)})
               </div>
             </div>
-            {oldQlpBalance && oldQlpBalance.gt(0) &&
-              (
-                <>
-                  <div className="App-card-row">
-                    <div className="label">Old Wallet
-                    </div>
-                    <div className="value">
-                      {formatAmount(oldQlpBalance, QLP_DECIMALS, 4, true)} QLP ($
-                      {formatAmount(oldQlpBalanceUsd, USD_DECIMALS, 2, true)})
-                      <button onClick={migrateStaking} style={{ background: "#448AFF", marginLeft: "10px", width: "140px", height: "50px", padding: "0" }} className="Stake-card-option">Migrate Staking</button>
-                    </div>
+            {oldQlpBalance && oldQlpBalance.gt(0) && (
+              <>
+                <div className="App-card-row">
+                  <div className="label">Old Wallet</div>
+                  <div className="value">
+                    {formatAmount(oldQlpBalance, QLP_DECIMALS, 4, true)} QLP ($
+                    {formatAmount(oldQlpBalanceUsd, USD_DECIMALS, 2, true)})
+                    <button
+                      onClick={migrateStaking}
+                      style={{
+                        background: "#448AFF",
+                        marginLeft: "10px",
+                        width: "140px",
+                        height: "50px",
+                        padding: "0",
+                      }}
+                      className="Stake-card-option"
+                    >
+                      Migrate Staking
+                    </button>
                   </div>
-                  <div className="App-card-row">
-                    <div className="label">Old Wallet Rewards
-                    </div>
-                    <div className="value">
-                      {formatAmount(oldQlpRewards, QLP_DECIMALS, 4, true)} WETH ($
-                      {formatAmount(oldQlpRewardsUsd, USD_DECIMALS, 2, true)})
-                    </div>
+                </div>
+                <div className="App-card-row">
+                  <div className="label">Old Wallet Rewards</div>
+                  <div className="value">
+                    {formatAmount(oldQlpRewards, QLP_DECIMALS, 4, true)} WETH ($
+                    {formatAmount(oldQlpRewardsUsd, USD_DECIMALS, 2, true)})
                   </div>
-                </>
-              )}
+                </div>
+              </>
+            )}
           </div>
           <div className="App-card-divider"></div>
           <div className="App-card-content">
@@ -837,17 +883,15 @@ export default function QlpSwap(props) {
                       console.log("tokensApr", tokensApr);
                       return (
                         <>
-                          {tokensApr && tokensApr.map(t => {
-                            return (
-                            <div className="Tooltip-row">
-                              <span className="label">
-                                {t.symbol} APR
-                              </span>
-                              <span>{t.apr}%</span>
-                            </div>
-                            )
-                          })
-                          }
+                          {tokensApr &&
+                            tokensApr.map((t) => {
+                              return (
+                                <div className="Tooltip-row">
+                                  <span className="label">{t.symbol} APR</span>
+                                  <span>{t.apr}%</span>
+                                </div>
+                              );
+                            })}
                         </>
                       );
                     }}
@@ -912,7 +956,8 @@ export default function QlpSwap(props) {
               defaultTokenName={"QLP"}
             >
               <div className="selected-token">
-                <img width={24} height={24} src={qlp24Icon} alt="qlp24Icon" />QLP
+                <img width={24} height={24} src={qlp24Icon} alt="qlp24Icon" />
+                QLP
               </div>
             </BuyInputSection>
           )}
@@ -1008,6 +1053,18 @@ export default function QlpSwap(props) {
               </div>
             </div>
           </div>
+          <WaitlistWidget
+            environment={2}
+            address={account}
+            subscriptionType="emailAndTelegram"
+            waitlistName="QuickSwapWaitlist"
+            title="Insured deposits: Sign-up for the QuickSwap Perp Insurance Waitlist"
+            successText="Congratulations! You have been added to the QuickSwap Perp Insurance waiting list."
+            option1="Smart contract hack risk and Oracle attack - 3%/year"
+            option2="zkEVM availability & zkEVM Bridge risk - 2.5%/year"
+            option3="Stablecoin depeg risk - USDT, USDC, DAI de-peg caused QLP value loss - 3%/year"
+          />
+
           <div className="QlpSwap-cta Exchange-swap-button-container">
             <button className="App-cta Exchange-swap-button" onClick={onClickPrimary} disabled={!isPrimaryEnabled()}>
               {getPrimaryText()}
@@ -1020,13 +1077,13 @@ export default function QlpSwap(props) {
         <div className="Page-title">Save Fees</div>
         {isBuying && (
           <div className="Page-description">
-            The fees can  vary based on the asset you wish to add liquidity for QLP.
+            The fees can vary based on the asset you wish to add liquidity for QLP.
             <br /> Enter the requested amount of QLP or asset to be added into the interface and compare the fees here.
           </div>
         )}
         {!isBuying && (
           <div className="Page-description">
-            The fees can  vary based on the asset you wish to add liquidity for QLP.
+            The fees can vary based on the asset you wish to add liquidity for QLP.
             <br /> Enter the requested amount of QLP or asset to be added into the interface and compare the fees here.
           </div>
         )}
@@ -1125,7 +1182,7 @@ export default function QlpSwap(props) {
               try {
                 tokenImage = getImageUrl({
                   path: `coins/others/${token.symbol.toLowerCase()}-original`,
-                  format: "png"
+                  format: "png",
                 });
               } catch (error) {
                 console.error(error);
@@ -1166,8 +1223,9 @@ export default function QlpSwap(props) {
                       />
                     );
                   case (isBuying && !isCapReached) || (!isBuying && managedUsd?.gt(0)):
-                    return `${formatAmount(tokenFeeBps, 2, 2, true, "-")}${tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0 ? "%" : ""
-                      }`;
+                    return `${formatAmount(tokenFeeBps, 2, 2, true, "-")}${
+                      tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0 ? "%" : ""
+                    }`;
                   default:
                     return "";
                 }
@@ -1214,7 +1272,6 @@ export default function QlpSwap(props) {
                         >
                           {token.name}
                         </div>
-
                       </div>
                     </div>
                   </td>
@@ -1322,7 +1379,7 @@ export default function QlpSwap(props) {
             try {
               tokenImage = getImageUrl({
                 path: `coins/others/${token.symbol.toLowerCase()}-original`,
-                format: "png"
+                format: "png",
               });
             } catch (error) {
               console.error(error);
@@ -1341,8 +1398,9 @@ export default function QlpSwap(props) {
                     />
                   );
                 case (isBuying && !isCapReached) || (!isBuying && managedUsd?.gt(0)):
-                  return `${formatAmount(tokenFeeBps, 2, 2, true, "-")}${tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0 ? "%" : ""
-                    }`;
+                  return `${formatAmount(tokenFeeBps, 2, 2, true, "-")}${
+                    tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0 ? "%" : ""
+                  }`;
                 default:
                   return "";
               }

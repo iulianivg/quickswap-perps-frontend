@@ -33,7 +33,7 @@ import {
   REFERRAL_CODE_KEY,
   REFERRAL_CODE_QUERY_PARAMS,
   POLYGON_ZKEVM,
-  DEFAULT_CHAIN_ID
+  DEFAULT_CHAIN_ID,
 } from "./Helpers";
 
 import Dashboard from "./views/Dashboard/Dashboard";
@@ -125,13 +125,11 @@ function WrongChainButton() {
     <>
       {wrongChain && (
         <>
-        <div className="App-header-user-link">
-          <div className="btn btn-red address-btn" onClick={() => swithToPolygonZkEVM()}>
-            Switch to Polygon zkEVM
+          <div className="App-header-user-link">
+            <div className="btn btn-red address-btn" onClick={() => swithToPolygonZkEVM()}>
+              Switch to Polygon zkEVM
+            </div>
           </div>
-        </div>
-
-      
         </>
       )}
     </>
@@ -313,7 +311,7 @@ function FullApp() {
       // for some reason after network is changed through Metamask
       // it triggers event with chainId = 1
       // reload helps web3 to return correct chain data
-      return window.ethereum.on("chainChanged", () => {
+      window.ethereum.on("chainChanged", () => {
         document.location.reload();
       });
     }
@@ -565,8 +563,6 @@ function FullApp() {
                 <AppHeaderLinks />
               </div>
               <div className="App-header-container-right">
-     
-
                 <WrongChainButton />
 
                 <AppHeaderUser
