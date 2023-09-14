@@ -37,7 +37,7 @@ import {
   REFERRAL_CODE_KEY,
   REFERRAL_CODE_QUERY_PARAMS,
   POLYGON_ZKEVM,
-  DEFAULT_CHAIN_ID
+  DEFAULT_CHAIN_ID,
 } from "./Helpers";
 
 import Dashboard from "./views/Dashboard/Dashboard";
@@ -90,7 +90,7 @@ import { Web3OnboardProvider, useConnectWallet } from "@web3-onboard/react";
 import useWeb3Onboard from "./hooks/useWeb3Onboard";
 import { UIContextProvider, useUIContext } from "./providers/InterfaceProvider";
 
-if ("ethereum" in window) {
+if ("ethereum" in window && window.ethereum.autoRefreshOnNetworkChange) {
   window.ethereum.autoRefreshOnNetworkChange = false;
 }
 
@@ -131,11 +131,11 @@ function WrongChainButton() {
     <>
       {wrongChain && (
         <>
-        <div className="App-header-user-link">
-          <div className="btn btn-red address-btn" onClick={() => swithToPolygonZkEVM()}>
-            Switch to Polygon zkEVM
+          <div className="App-header-user-link">
+            <div className="btn btn-red address-btn" onClick={() => swithToPolygonZkEVM()}>
+              Switch to Polygon zkEVM
+            </div>
           </div>
-        </div>
         </>
       )}
     </>
@@ -328,7 +328,7 @@ function FullApp() {
       // for some reason after network is changed through Metamask
       // it triggers event with chainId = 1
       // reload helps web3 to return correct chain data
-      return window.ethereum.on("chainChanged", () => {
+      window.ethereum.on("chainChanged", () => {
         document.location.reload();
       });
     }

@@ -92,7 +92,7 @@ export const MARGIN_FEE_BASIS_POINTS = 10;
 
 export const LIQUIDATION_FEE = expandDecimals(10, USD_DECIMALS);
 
-export const QLP_COOLDOWN_DURATION = 60;
+export const QLP_COOLDOWN_DURATION = 0;
 export const THRESHOLD_REDEMPTION_VALUE = expandDecimals(993, 27); // 0.993
 export const FUNDING_RATE_PRECISION = 1000000;
 
@@ -1855,54 +1855,6 @@ export const getTokenInfo = (infoTokens, tokenAddress, replaceNative, nativeToke
     return infoTokens[AddressZero];
   }
   return infoTokens[tokenAddress];
-};
-
-const NETWORK_METADATA = {
-  [POLYGON_ZKEVM]: {
-    chainId: "0x" + POLYGON_ZKEVM.toString(16),
-    chainName: "polygon_zkevm",
-    nativeCurrency: {
-      name: "ETH",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    rpcUrls: POLYGON_RPC_PROVIDERS,
-    blockExplorerUrls: [getExplorerUrl(POLYGON_ZKEVM)],
-  },
-};
-
-export const addNetwork = async (metadata) => {
-  await window.ethereum.request({ method: "wallet_addEthereumChain", params: [metadata] }).catch();
-};
-
-export const switchNetwork = async (chainId, active) => {
-  if (!active) {
-    // chainId in localStorage allows to switch network even if wallet is not connected
-    // or there is no wallet at all
-    localStorage.setItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY, chainId);
-    document.location.reload();
-    return;
-  }
-
-  try {
-    const chainIdHex = "0x" + chainId.toString(16);
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: chainIdHex }],
-    });
-    helperToast.success("Connected to " + getChainName(chainId));
-    return getChainName(chainId);
-  } catch (ex) {
-    // https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods
-    // This error code indicates that the chain has not been added to MetaMask.
-    // 4001 error means user has denied the request
-    // If the error code is not 4001, then we need to add the network
-    if (ex.code !== 4001) {
-      return await addNetwork(NETWORK_METADATA[chainId]);
-    }
-
-    console.error("error", ex);
-  }
 };
 
 export function isMobileDevice(navigator) {
