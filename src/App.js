@@ -83,6 +83,8 @@ import { ModalProvider } from "./components/Modal/ModalProvider";
 import { Web3OnboardProvider, useConnectWallet } from "@web3-onboard/react";
 
 import useWeb3Onboard from "./hooks/useWeb3Onboard";
+import useMasaAnalytics from "./hooks/useMasaAnalytics";
+import { useHistory } from "react-router-dom";
 
 if ("ethereum" in window && window.ethereum.autoRefreshOnNetworkChange) {
   window.ethereum.autoRefreshOnNetworkChange = false;
@@ -512,6 +514,26 @@ function FullApp() {
       wsPositionRouter.off("CancelDecreasePosition", onCancelDecreasePosition);
     };
   }, [active, chainId, vaultAddress, positionRouterAddress]);
+
+  const { firePageViewEvent, fireConnectWalletEvent } = useMasaAnalytics();
+
+  const { location } = useHistory();
+  const { pathname } = location;
+  useEffect(() => {
+    const page = `https://perps.quickswap.exchange/#${pathname}`;
+    if (account) {
+      firePageViewEvent({ page, user_address: account });
+    } else {
+      firePageViewEvent({ page });
+    }
+  }, [pathname]);
+
+  const wallet_type = wallet?.label;
+  useEffect(() => {
+    if (account && wallet_type) {
+      fireConnectWalletEvent({ user_address: account, wallet_type });
+    }
+  }, [wallet_type, account]);
 
   return (
     <>
