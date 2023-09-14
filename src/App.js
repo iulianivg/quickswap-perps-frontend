@@ -584,8 +584,6 @@ function FullApp() {
                 <AppHeaderLinks />
               </div>
               <div className="App-header-container-right">
-
-
                 <WrongChainButton />
 
                 <AppHeaderUser
