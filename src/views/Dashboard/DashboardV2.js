@@ -405,7 +405,7 @@ export default function DashboardV2() {
                   <div>${formatAmount(totalFees, USD_DECIMALS, 0, true)}</div>
                 </div>
                 <div className="App-card-row padding-left">
-                  <div className="label">Collected fees from Sep 08, 2023</div>
+                  <div className="label">Collected fees from Sep 15, 2023</div>
                   <div>${numberWithCommas(totalFeesDistributed.toFixed(0))}</div>
                 </div>
               </div>
