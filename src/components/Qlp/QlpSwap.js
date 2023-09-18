@@ -1062,6 +1062,11 @@ export default function QlpSwap(props) {
             option1="Smart contract hack risk and Oracle attack - 3%/year"
             option2="zkEVM availability & zkEVM Bridge risk - 2.5%/year"
             option3="Stablecoin depeg risk - USDT, USDC, DAI de-peg caused QLP value loss - 3%/year"
+            showTextbox={true}
+            textboxRequired={true}
+            textboxLabel={"How much cover would you like us to set aside for you?"}
+            textboxType={"positiveNumber"}
+            textboxPlaceholder={"$"}
           />
 
           <div className="QlpSwap-cta Exchange-swap-button-container">

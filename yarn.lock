@@ -7966,7 +7966,7 @@ flatted@^3.2.7:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.7.tgz#609f39207cb614b89d0765b477cb2d437fbf9787"
   integrity sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==
 
-follow-redirects@^1.0.0, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
+follow-redirects@^1.0.0, follow-redirects@^1.14.0, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
@@ -12550,10 +12550,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rm-react-components@^1.0.20:
-  version "1.0.20"
-  resolved "https://registry.yarnpkg.com/rm-react-components/-/rm-react-components-1.0.20.tgz#659a9aaf684863b0c986693067d04db188ec46f5"
-  integrity sha512-FC1S82U+UCQL5JVqXuq4UAv3ccbD330hDvC5aUATAK1J+aP40zN5pcfz261Aa4WQxg6XCuhqzl4p0wNzbxYfxQ==
+rm-react-components@^1.0.21:
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/rm-react-components/-/rm-react-components-1.0.21.tgz#c252c737d5cde80d5dd536a77c2b7837791d5de7"
+  integrity sha512-eBLmZ5czbS7/wJaGic3PtGfpTaSYGViXOftyXGDvuTkOx2WLDJHAVRCyLMOB6p5FBgfVA7eboQX6jB0YIsWgMA==
   dependencies:
     "@ethersproject/providers" "^5.7.2"
     bignumber.js "^9.1.1"
