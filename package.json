@@ -52,7 +52,7 @@
     "react-toastify": "6.0.9",
     "react-use": "^17.2.4",
     "recharts": "^2.0.9",
-    "rm-react-components": "^1.0.20",
+    "rm-react-components": "^1.0.21",
     "swr": "^0.4.2",
     "tty-browserify": "^0.0.1",
     "web-vitals": "^1.0.1"
