@@ -16,7 +16,6 @@ export default function useInitWeb3Onboard() {
   const [web3Onboard, setWeb3Onboard] = useState(null);
 
   const injected = injectedModule({
-    displayUnavailable: true,
     displayUnavailable: [
       ProviderLabel.MetaMask,
       ProviderLabel.Trust,
@@ -61,7 +60,7 @@ export default function useInitWeb3Onboard() {
     projectId: WALLET_CONNECT_PROJECT_ID,
     requiredChains: [DEFAULT_CHAIN_ID],
     qrcodeModalOptions: {
-      mobileLinks: ["rainbow", "metamask", "argent", "trust", "imtoken", "pillar"],
+      mobileLinks: ["rainbow", "metamask", "argent", "trust", "imtoken", "pillar", "okxwallet"],
     },
   });
 
