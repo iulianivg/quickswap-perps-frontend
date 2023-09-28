@@ -13,7 +13,7 @@ export const $reddit = <svg xmlns="http://www.w3.org/2000/svg" width="24" height
 </g>
 </svg>
 
-export const $discord = 
+export const $discord =
 <svg id="组_14431" data-name="组 14431" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <g id="logo--discord" transform="translate(4.111 3.677)">
     <path id="路径_5741" data-name="路径 5741" d="M13.166,14.905a1,1,0,1,0,.92,1,.961.961,0,0,0-.92-1Zm3.291,0a1,1,0,1,0,.92,1,.961.961,0,0,0-.92-1Z" transform="translate(-6.908 -7.341)" fill="#696c80"/>
@@ -23,7 +23,7 @@ export const $discord =
 </svg>
 
 
-export const $medium = 
+export const $medium =
 <svg id="组_14427" data-name="组 14427" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <path id="减去_6" data-name="减去 6" d="M13.475,10.717H8.18V10.49L9.271,9.432c.107-.109.107-.138.107-.3V2.993l-3.03,7.7H5.937l-3.53-7.7v5.16a.706.706,0,0,0,.2.592L4.02,10.466v.227H0v-.227L1.418,8.745A.694.694,0,0,0,1.6,8.153V2.186a.526.526,0,0,0-.17-.441L.17.227V0H4.083L7.11,6.634,9.77,0H13.5V.227L12.423,1.259a.314.314,0,0,0-.12.3V9.154a.315.315,0,0,0,.12.3l1.052,1.033v.227Z" transform="translate(5.25 6.75)" fill="#696c80"/>
   <rect id="矩形_17858" data-name="矩形 17858" width="24" height="24" fill="none"/>
@@ -40,14 +40,14 @@ export const $youtube =
 </svg>
 
 
-export const $telegram = 
+export const $telegram =
 <svg id="组_14429" data-name="组 14429" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <path id="telegram-1" d="M11.15,15a.721.721,0,0,0,.671.088.7.7,0,0,0,.439-.509c.527-2.477,1.806-8.747,2.285-11a.474.474,0,0,0-.158-.46A.486.486,0,0,0,13.9,3.03C11.362,3.972,3.53,6.91.329,8.095a.5.5,0,0,0,.031.948C1.8,9.472,3.68,10.07,3.68,10.07s.881,2.66,1.34,4.012a.531.531,0,0,0,.366.349.525.525,0,0,0,.492-.126l1.878-1.773S9.921,14.121,11.15,15ZM4.472,9.734l1.018,3.359.226-2.127,6.177-5.571a.168.168,0,0,0,.02-.229.172.172,0,0,0-.228-.039L4.472,9.734Z" transform="translate(4.722 3.021)" fill="#696c80" fillRule="evenodd"/>
   <rect id="矩形_17858" data-name="矩形 17858" width="24" height="24" fill="none"/>
 </svg>
 
 
-export const $coinGecko = 
+export const $coinGecko =
 <svg id="组_21833" data-name="组 21833" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <circle id="椭圆_499" data-name="椭圆 499" cx="0.39" cy="0.39" r="0.39" transform="translate(11.625 14.075)" fill="#696c80"/>
   <g id="X23Swb.tif">
@@ -60,7 +60,7 @@ export const $coinGecko =
   </g>
 </svg>
 
-export const $twitter2 = 
+export const $twitter2 =
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M20.8701 20L14.006 10.8157L20.3625 4H18.9607L13.3776 9.96979L8.90634 4H4L10.6465 12.8943L4 20H5.40181L11.2749 13.716L15.9637 20H20.8701ZM18.8399 18.9349H16.4955L6.10354 5.06344H8.44795L18.8399 18.9349Z" fill="#646668" />
   </svg>

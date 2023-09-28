@@ -5,10 +5,45 @@
   background: url('./img/heroBkg.svg') no-repeat;
 }
 
+
+.shepherd-element{
+  max-width: 450px !important;
+  box-shadow: -14.719192504882812px 17.347618103027344px 84.10966491699219px rgba(0, 56.10, 255, 0.30);
+  border-radius: 16px;
+  border-left: 1.50px solid;
+  border-top: 1.50px solid;
+  border-right: 1.50px solid;
+  border-bottom: 1.50px solid;
+}
+.shepherd-cancel-icon{
+  display: none;
+}
+
 @media (max-width: 1200px) {
   .App {
     padding: 0 8px;
   }
+}
+
+.shepherd-button {
+  background: transparent;
+  border: 0px;
+  color: inherit !important;
+  margin-right: 0.5rem;
+}
+
+.shepherd-button:hover {
+  background: transparent !important;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+  background: transparent !important;
+}
+
+.shepherd-arrow:before {
+  background: #fff !important;
+  content: "";
+  transform: rotate(45deg);
 }
 
 .App-header-backdrop {

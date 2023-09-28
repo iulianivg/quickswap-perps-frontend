@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
 import { SWRConfig } from "swr";
 import { ethers } from "ethers";
 
@@ -14,6 +14,10 @@ import HeaderNav from "./HeaderNav";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 
 import useInitWeb3Onboard from "./hooks/useInitWeb3Onboard";
+
+import "shepherd.js/dist/css/shepherd.css";
+import { ShepherdTourContext } from "react-shepherd";
+
 
 import {
   DEFAULT_SLIPPAGE_AMOUNT,
@@ -69,6 +73,7 @@ import { ConnectWalletButton } from "./components/Common/Button";
 import useEventToast from "./components/EventToast/useEventToast";
 import EventToastContainer from "./components/EventToast/EventToastContainer";
 import SEO from "./components/Common/SEO";
+import Tour from "./components/tour";
 import useRouteQuery from "./hooks/useRouteQuery";
 import { encodeReferralCode } from "./Api/referrals";
 
@@ -83,6 +88,7 @@ import { ModalProvider } from "./components/Modal/ModalProvider";
 import { Web3OnboardProvider, useConnectWallet } from "@web3-onboard/react";
 
 import useWeb3Onboard from "./hooks/useWeb3Onboard";
+import { UIContextProvider, useUIContext } from "./providers/InterfaceProvider";
 import useMasaAnalytics from "./hooks/useMasaAnalytics";
 import { useHistory } from "react-router-dom";
 
@@ -243,10 +249,14 @@ function AppHeaderUser({
   const { account, active, library, chainId } = useWeb3Onboard();
 
   const [{ wallet }, connect, disconnect] = useConnectWallet();
+  const { currentTour } = useUIContext();
 
   useEffect(() => {
     if (active) {
       setWalletModalVisible(false);
+      if (localStorage.getItem("viewed_tour") !== "true") {
+        if(currentTour.current?.isActive()) currentTour.current.show('step3')
+      }
     }
   }, [active, setWalletModalVisible]);
 
@@ -254,8 +264,13 @@ function AppHeaderUser({
 
   const handleConnectWallet = async () => {
     try {
-      await connect();
-    } catch (e) {
+      if(currentTour.current?.isActive()) currentTour.current.hide('welcome')
+      await connect().then(res=>{
+        if (localStorage.getItem("viewed_tour") !== "true") {
+          if(currentTour.current?.isActive()) res.length !== 0 ? currentTour.current.show('step3') : currentTour.current.show('welcome')
+        }
+      })
+    }catch (e) {
       console.log(e);
     }
   };
@@ -307,6 +322,8 @@ function FullApp() {
     }
   }, [query]);
 
+  const tour = useContext(ShepherdTourContext);
+
   useEffect(() => {
     if (window.ethereum) {
       // hack
@@ -338,6 +355,7 @@ function FullApp() {
   const [walletModalVisible, setWalletModalVisible] = useState();
 
   const connectWallet = async () => {
+    //if (currentTour.current?.isActive()) currentTour.current.show("installation");
     await connect();
   };
 
@@ -410,14 +428,17 @@ function FullApp() {
     setSavedSlippageAmount(basisPoints);
     setIsSettingsVisible(false);
   };
-  useEffect(() => {
-    if (isDrawerVisible) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => (document.body.style.overflow = "unset");
-  }, [isDrawerVisible]);
+  // useEffect(() => {
+  //   const isTourViewed = localStorage.getItem("viewed_tour")
+
+  //   if (isDrawerVisible || isTourViewed !== "true") {
+  //     document.body.style.overflow = "hidden";
+  //   } else {
+  //     document.body.style.overflow = "unset";
+  //   }
+
+  //   return () => (document.body.style.overflow = "unset");
+  // }, [isDrawerVisible]);
 
   const [pendingTxns, setPendingTxns] = useState([]);
 
@@ -537,7 +558,7 @@ function FullApp() {
 
   return (
     <>
-      <div className="App">
+        <div className="App">
         {/* <img style={{ position: "absolute" }} src={backgroundLight} alt="background-light" /> */}
         {/* <div className="App-background-side-1"></div>
         <div className="App-background-side-2"></div>
@@ -652,20 +673,22 @@ function FullApp() {
               <Redirect to="/trade" />
             </Route>
             <Route exact path="/trade">
-              <ModalProvider>
-                <Exchange
-                  ref={exchangeRef}
-                  savedShowPnlAfterFees={savedShowPnlAfterFees}
-                  savedIsPnlInLeverage={savedIsPnlInLeverage}
-                  setSavedIsPnlInLeverage={setSavedIsPnlInLeverage}
-                  savedSlippageAmount={savedSlippageAmount}
-                  setPendingTxns={setPendingTxns}
-                  pendingTxns={pendingTxns}
-                  savedShouldShowPositionLines={savedShouldShowPositionLines}
-                  setSavedShouldShowPositionLines={setSavedShouldShowPositionLines}
-                  connectWallet={connectWallet}
-                />
-              </ModalProvider>
+              <Tour>
+                <ModalProvider>
+                  <Exchange
+                    ref={exchangeRef}
+                    savedShowPnlAfterFees={savedShowPnlAfterFees}
+                    savedIsPnlInLeverage={savedIsPnlInLeverage}
+                    setSavedIsPnlInLeverage={setSavedIsPnlInLeverage}
+                    savedSlippageAmount={savedSlippageAmount}
+                    setPendingTxns={setPendingTxns}
+                    pendingTxns={pendingTxns}
+                    savedShouldShowPositionLines={savedShouldShowPositionLines}
+                    setSavedShouldShowPositionLines={setSavedShouldShowPositionLines}
+                    connectWallet={connectWallet}
+                  />
+                </ModalProvider>
+              </Tour>
             </Route>
             <Route exact path="/dashboard">
               <Dashboard />
@@ -726,7 +749,6 @@ function FullApp() {
         pauseOnHover
       />
       <EventToastContainer />
-
       <Modal
         className="App-settings"
         isVisible={isSettingsVisible}
@@ -865,11 +887,14 @@ function App() {
 
   return (
     <SWRConfig value={{ refreshInterval: 15000, dedupingInterval: 5000 }}>
-      <Web3OnboardProvider web3Onboard={web3Onboard}>
-        <SEO>
-          <FullApp />
-        </SEO>
-      </Web3OnboardProvider>
+      <UIContextProvider>
+        <Web3OnboardProvider web3Onboard={web3Onboard}>
+          <SEO>
+            <FullApp />
+          </SEO>
+        </Web3OnboardProvider>
+      </UIContextProvider>
+
     </SWRConfig>
   );
 }
