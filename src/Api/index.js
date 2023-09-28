@@ -864,7 +864,6 @@ export async function updateDecreaseOrder(
   const method = "updateDecreaseOrder";
   const orderBookAddress = getContract(chainId, "OrderBook");
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner());
-  
   opts.gasLimit = bigNumberify(100000);
 
   return callContract(chainId, contract, method, params, opts);
@@ -979,7 +978,7 @@ export async function callContract(chainId, contract, method, params, opts) {
     const txUrl = getExplorerUrl(chainId) + "tx/" + res.hash;
     const sentMsg = opts.sentMsg || "Transaction sent.";
     helperToast.success(
-      <div>
+      <div className="checkStatus" >
         {sentMsg}{" "}
         <a style={{ color: "#ffaa27" }} href={txUrl} target="_blank" rel="noopener noreferrer">
           View status.
@@ -1057,14 +1056,14 @@ function getTotalVolumeFromGraph() {
   const nowTs = parseInt(Date.now() / 1000);
 
   const query = gql(`{
-      volumeStats( 
-        where: {period: total , timestamp_lte: ${nowTs}}  
-        ) 
-     {  
-       margin    
-       liquidation    
-       swap    
-       mint    
+      volumeStats(
+        where: {period: total , timestamp_lte: ${nowTs}}
+        )
+     {
+       margin
+       liquidation
+       swap
+       mint
        burn
       }
     }`);

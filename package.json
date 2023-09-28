@@ -48,6 +48,7 @@
     "react-jazzicon": "^1.0.4",
     "react-router-dom": "^5.2.0",
     "react-select": "^5.2.1",
+    "react-shepherd": "^4.2.0",
     "react-tabs": "^3.2.3",
     "react-toastify": "6.0.9",
     "react-use": "^17.2.4",
@@ -114,6 +115,6 @@
     ]
   },
   "engines": {
-    "node": "14 || 16 || 18"
+    "node": "14 || 16"
   }
 }

@@ -764,14 +764,14 @@ export default function ConfirmationBox(props) {
 
   return (
     <div className="Confirmation-box">
-      <Modal isVisible={true} setIsVisible={() => setIsConfirming(false)} label={title}>
+      <Modal isVisible={true} setIsVisible={() => setIsConfirming(false)} className=" Confirmation-box" label={title}>
         {renderMain()}
         {isSwap && renderSwapSection()}
         {!isSwap && renderMarginSection()}
         <div className="Confirmation-box-row">
           <button
             onClick={onConfirmationClick}
-            className="App-cta Confirmation-box-button"
+            className="App-cta Confirmation-box-button Confirmation-box-swap-button long-btn-confirm"
             disabled={!isPrimaryEnabled()}
           >
             {getPrimaryText()}

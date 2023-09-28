@@ -13,6 +13,7 @@ import { ethers } from "ethers";
 import arrowIcon from "../../img/ic_convert_down.svg";
 import { BsArrowRight } from "react-icons/bs";
 
+import { useUIContext } from "../../providers/InterfaceProvider";
 import {
   helperToast,
   formatAmount,
@@ -174,8 +175,8 @@ export default function SwapBox(props) {
   const { userReferralCode } = Api.useUserReferralCode(library, chainId, account);
   const userReferralCodeInLocalStorage = window.localStorage.getItem(REFERRAL_CODE_KEY);
 
+  const { currentTour } = useUIContext();
   const { fireEvent } = useMasaAnalytics();
-
   let allowedSlippage = savedSlippageAmount;
   if (isHigherSlippageAllowed) {
     allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
@@ -217,12 +218,14 @@ export default function SwapBox(props) {
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
 
   let [orderOption, setOrderOption] = useLocalStorageSerializeKey([chainId, "Order-option"], MARKET);
+  let [,setOrderOptionValue] = useLocalStorageSerializeKey(["Order-option"], MARKET);
   if (!flagOrdersEnabled) {
     orderOption = MARKET;
   }
 
   const onOrderOptionChange = (option) => {
     setOrderOption(option);
+    setOrderOptionValue(option)
   };
 
   const isMarketOrder = orderOption === MARKET;
@@ -1262,7 +1265,9 @@ export default function SwapBox(props) {
       setPendingTxns,
       showModal,
     })
-      .then(async (res) => {})
+      .then(async (res) => {
+        if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.show('swapCheckAllTtransactions');},100) };
+      })
       .catch((e) => console.log("error: ", e))
       .finally(() => {
         setIsSubmitting(false);
@@ -1283,7 +1288,9 @@ export default function SwapBox(props) {
       setPendingTxns,
       showModal,
     })
-      .then(async (res) => {})
+      .then(async (res) => {
+        if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.show('swapCheckAllTtransactions');},100) };
+      })
       .catch((e) => console.log("error: ", e))
       .finally(() => {
         setIsSubmitting(false);
@@ -1362,6 +1369,14 @@ export default function SwapBox(props) {
       })
         .then(() => {
           setIsConfirming(false);
+          if(!isMarketOrder){
+            if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.next();},100) };
+          }else{
+            if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.show('swapCheckAllTtransactions');},100) };
+          }
+         
+        }).catch((error)=>{
+          console.log(error)
         })
         .finally(() => {
           setIsSubmitting(false);
@@ -1398,6 +1413,7 @@ export default function SwapBox(props) {
       showModal,
     })
       .then(async () => {
+        if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.show('swapCheckAllTtransactions');},100) };
         setIsConfirming(false);
       })
       .catch((e) => console.log("error: ", e))
@@ -1457,7 +1473,9 @@ export default function SwapBox(props) {
     )
       .then(() => {
         setIsConfirming(false);
+        if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.next()},100) };
       })
+      .catch((error)=> console.log(error))
       .finally(() => {
         setIsSubmitting(false);
         setIsPendingConfirmation(false);
@@ -1555,9 +1573,13 @@ export default function SwapBox(props) {
     if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
       setIsSubmitting(false);
       setIsPendingConfirmation(false);
+      localStorage.setItem('leaveGasLimit','true')
       helperToast.error(
         `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(chainId, "nativeTokenSymbol")} for gas`
       );
+      setTimeout(()=>{
+        localStorage.removeItem('leaveGasLimit')
+      },7000)
       return;
     }
 
@@ -1582,7 +1604,7 @@ export default function SwapBox(props) {
     })
       .then(async () => {
         setIsConfirming(false);
-
+        if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.next()},100) };
         const key = getPositionKey(account, path[path.length - 1], indexTokenAddress, isLong);
         let nextSize = toUsdMax;
         if (hasExistingPosition) {
@@ -1616,6 +1638,7 @@ export default function SwapBox(props) {
     setSwapOption(opt);
     if (orderOption === STOP) {
       setOrderOption(MARKET);
+      setOrderOptionValue(MARKET)
     }
     setAnchorOnFromAmount(true);
     setFromValue("");
@@ -1680,6 +1703,7 @@ export default function SwapBox(props) {
   const onClickPrimary = () => {
     if (isStopOrder) {
       setOrderOption(MARKET);
+      setOrderOptionValue(MARKET);
       return;
     }
 
@@ -1724,9 +1748,14 @@ export default function SwapBox(props) {
         return;
       }
     }
-
+    if(!isConfirming && isMarketOrder){
+      if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.next()},100) };
+    }
     setIsConfirming(true);
     setIsHigherSlippageAllowed(false);
+    if(!isMarketOrder){
+      if (currentTour.current?.isActive()) {setTimeout(()=>{currentTour.current?.next()},100) };
+    }
   };
 
   const isStopOrder = orderOption === STOP;
@@ -1877,7 +1906,7 @@ export default function SwapBox(props) {
         </div>
         {showFromAndToSection && (
           <React.Fragment>
-            <div className="Exchange-swap-section">
+            <div className="Exchange-swap-section pay-exchange">
               <div className="Exchange-swap-section-top">
                 <div>
                   {fromUsdMin && (
@@ -1912,6 +1941,7 @@ export default function SwapBox(props) {
                 <div>
                   <TokenSelector
                     label="Pay"
+                    className="Pay-modal"
                     chainId={chainId}
                     tokenAddress={fromTokenAddress}
                     onSelectToken={onSelectFromToken}
@@ -1929,7 +1959,7 @@ export default function SwapBox(props) {
                 <img src={arrowIcon} alt="arrowIcon" />
               </div>
             </div>
-            <div className="Exchange-swap-section">
+            <div className="Exchange-swap-section long-exchange">
               <div className="Exchange-swap-section-top">
                 <div>
                   {toUsdMax && (
@@ -1960,6 +1990,7 @@ export default function SwapBox(props) {
                 <div>
                   <TokenSelector
                     label={getTokenLabel()}
+                    className="swapbox-modal"
                     chainId={chainId}
                     tokenAddress={toTokenAddress}
                     onSelectToken={onSelectToToken}
@@ -1974,7 +2005,7 @@ export default function SwapBox(props) {
           </React.Fragment>
         )}
         {showTriggerRatioSection && (
-          <div className="Exchange-swap-section">
+          <div className="Exchange-swap-section price-swap">
             <div className="Exchange-swap-section-top">
               <div>Price</div>
               {fromTokenInfo && toTokenInfo && (
@@ -2021,7 +2052,7 @@ export default function SwapBox(props) {
           </div>
         )}
         {showTriggerPriceSection && (
-          <div className="Exchange-swap-section">
+          <div className="Exchange-swap-section price-exchange">
             <div className="Exchange-swap-section-top">
               <div>Price</div>
               <div
@@ -2275,8 +2306,12 @@ export default function SwapBox(props) {
             .
           </div>
         )}
-        <div className="Exchange-swap-button-container">
-          <button className="App-cta Exchange-swap-button" onClick={onClickPrimary} disabled={!isPrimaryEnabled()}>
+        <div className="Exchange-swap-button-container ">
+          <button
+            className="App-cta Exchange-swap-button long-short-swap-button swap-button leverage-btn"
+            onClick={onClickPrimary}
+            disabled={!isPrimaryEnabled()}
+          >
             {getPrimaryText()}
           </button>
         </div>

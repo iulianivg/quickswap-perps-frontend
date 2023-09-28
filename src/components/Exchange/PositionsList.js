@@ -28,6 +28,7 @@ import {
 import PositionShare from "./PositionShare";
 import PositionDropdown from "./PositionDropdown";
 
+import { useUIContext } from "../../providers/InterfaceProvider";
 const getOrdersForPosition = (account, position, orders, nativeTokenAddress) => {
   if (!orders || orders.length === 0) {
     return [];
@@ -123,6 +124,13 @@ export default function PositionsList(props) {
     setMarket(position.isLong ? LONG : SHORT, position.indexToken.address);
   };
 
+  const { currentTour } = useUIContext();
+ const closePosition = (position) =>{
+  sellPosition(position); 
+   if (currentTour.current?.isActive()) { 
+    setTimeout(()=>{currentTour.current?.show('CloseModal');},100) 
+     }; 
+ } 
   return (
     <div className="PositionsList">
       <PositionEditor
@@ -438,7 +446,7 @@ export default function PositionsList(props) {
       <table className="Exchange-list large table-normalizer">
         <tbody>
           <tr className="Exchange-list-header">
-            <th>Position</th>
+            <th className="position-heading">Position</th>
             <th>Net Value</th>
             <th>Size</th>
             <th>Collateral</th>
@@ -462,7 +470,7 @@ export default function PositionsList(props) {
               </td>
             </tr>
           )}
-          {positions.map((position) => {
+          {positions.map((position, index) => {
             const liquidationPrice = getLiquidationPrice(position) || bigNumberify(0);
             const positionOrders = getOrdersForPosition(account, position, orders, nativeTokenAddress);
             const hasOrderError = !!positionOrders.find((order) => order.error);
@@ -640,8 +648,8 @@ export default function PositionsList(props) {
 
                 <td>
                   <button
-                    className="Exchange-list-action close-action"
-                    onClick={() => sellPosition(position)}
+                    className={`Exchange-list-action close-action  ${index === 0 && "exchange-list-close-action"}`}
+                    onClick={() =>closePosition(position)}
                     disabled={position.size.eq(0)}
                   >
                     Close

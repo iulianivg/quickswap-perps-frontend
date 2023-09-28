@@ -420,7 +420,11 @@ export const Exchange = forwardRef((props, ref) => {
 
   const fromTokenAddress = tokenSelection[swapOption].from;
   const toTokenAddress = tokenSelection[swapOption].to;
-
+  useEffect(()=>{
+    if(Object.keys(JSON.parse(localStorage.getItem('Swap-option-v2'))).length === 0){
+      setSwapOption(LONG)
+    }
+  },[])
   const setFromTokenAddress = useCallback(
     (selectedSwapOption, address) => {
       const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection));
@@ -658,7 +662,7 @@ export const Exchange = forwardRef((props, ref) => {
       } within the allowed slippage, you can adjust the allowed slippage in the settings on the top right of the page.`;
 
       pushErrorNotification(chainId, message, e);
-      
+
       showModal(<TradeFailed />);
 
       const key = getPositionKey(account, path[path.length - 1], indexToken, isLong);
@@ -692,7 +696,7 @@ export const Exchange = forwardRef((props, ref) => {
       } within the allowed slippage, you can adjust the allowed slippage in the settings on the top right of the page.`;
 
       pushErrorNotification(chainId, message, e);
-      
+
       showModal(<TradeFailed />);
 
       const key = getPositionKey(account, path[path.length - 1], indexToken, isLong);
@@ -825,7 +829,7 @@ export const Exchange = forwardRef((props, ref) => {
             option={listSection}
             onChange={(section) => setListSection(section)}
             type="inline"
-            className="Exchange-list-tabs"
+            className="Exchange-list-tabs charts-list-tabs"
           />
           <div className="align-right Exchange-should-show-position-lines">
             {renderCancelOrderButton()}
